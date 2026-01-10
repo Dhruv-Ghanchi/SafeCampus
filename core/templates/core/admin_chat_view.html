@@ -1,0 +1,28 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">
+        <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-bold">Audit Transcript: {{ incident.case_token }}</h2>
+            <a href="{% url 'admin_dashboard' %}" class="text-indigo-600 font-bold">← Return</a>
+        </div>
+        <p class="text-gray-500 mt-2">Overseeing conversation between <strong>{% if incident.is_anonymous and not incident.is_identity_revealed %}Anonymous Student{% else %}{{ incident.reporter.username }}{% endif %}</strong> and <strong>Counsellor Staff</strong>.</p>
+    </div>
+
+    <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
+        <div class="p-4 bg-gray-800 text-white text-xs font-bold uppercase tracking-widest">Read Only Mode</div>
+        <div class="p-6 h-96 overflow-y-auto space-y-4 bg-gray-50">
+            {% for msg in incident.messages.all %}
+                <div class="flex flex-col {% if msg.sender.role == 'student' %}items-start{% else %}items-end{% endif %}">
+                    <div class="max-w-md p-3 rounded-lg text-sm {% if msg.sender.role == 'student' %}bg-white border text-gray-800{% else %}bg-indigo-600 text-white{% endif %}">
+                        <p class="font-black text-[9px] uppercase opacity-75">{{ msg.sender.username }} ({{ msg.sender.role }})</p>
+                        {{ msg.text }}
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-center py-20 text-gray-400 italic">No messages have been exchanged for this case yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

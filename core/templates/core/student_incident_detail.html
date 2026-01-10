@@ -1,0 +1,78 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="max-w-4xl mx-auto py-6">
+    <div class="mb-6 flex justify-between items-center">
+        <a href="{% url 'student_dashboard' %}" class="text-sm font-bold text-slate-500 hover:text-indigo-600">← Back to Dashboard</a>
+        <span class="text-xs font-mono bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full font-bold">Case #{{ incident.case_token }}</span>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-1 space-y-6">
+            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                <h2 class="font-black text-xl text-slate-900 mb-2">{{ incident.title }}</h2>
+                <div class="space-y-3">
+                    <p class="text-xs font-bold text-indigo-600 uppercase">{{ incident.status }}</p>
+                    <p class="text-sm text-slate-500">Location: <strong>{{ incident.location }}</strong></p>
+                </div>
+
+                {% if incident.evidence %}
+                <div class="mt-6 pt-6 border-t">
+                    <p class="text-[10px] font-black text-slate-400 uppercase mb-2">My Evidence Attachment</p>
+                    <a href="{{ incident.evidence.url }}" target="_blank" class="flex items-center gap-2 text-xs font-bold text-indigo-600 hover:underline">
+                        <span>📄</span> View Attached File
+                    </a>
+                </div>
+                {% endif %}
+
+                {% if incident.is_anonymous and not incident.is_identity_revealed %}
+                <div class="mt-8">
+                    <form action="{% url 'reveal_identity' incident.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="w-full bg-rose-50 text-rose-600 py-3 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-rose-100 transition">
+                            Reveal My Identity
+                        </button>
+                    </form>
+                    <p class="text-[9px] text-slate-400 mt-2 text-center">Reveal identity to enable chat with a counsellor.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden flex flex-col h-[500px]">
+                <div class="p-4 border-b bg-slate-50 flex justify-between">
+                    <span class="text-sm font-black text-slate-700">Secure Message Thread</span>
+                    <span class="text-[10px] text-emerald-500 font-black uppercase">Encrypted</span>
+                </div>
+
+                <div class="flex-1 p-6 overflow-y-auto space-y-4 bg-white">
+                    {% for msg in incident.messages.all %}
+                        <div class="flex {% if msg.sender == user %}justify-end{% else %}justify-start{% endif %}">
+                            <div class="max-w-[80%] p-4 rounded-2xl text-sm {% if msg.sender == user %}bg-indigo-600 text-white rounded-tr-none{% else %}bg-slate-100 text-slate-800 rounded-tl-none{% endif %}">
+                                <p class="font-black text-[10px] uppercase opacity-70 mb-1">{{ msg.sender.username }}</p>
+                                {{ msg.text }}
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="text-center py-20 text-slate-300">
+                            <p class="text-sm font-medium">No messages yet.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                {% if incident.is_anonymous and not incident.is_identity_revealed %}
+                <div class="p-4 bg-slate-50 text-center border-t italic text-slate-400 text-xs">
+                    Please reveal your identity to start a conversation with the staff.
+                </div>
+                {% else %}
+                <form method="post" class="p-4 border-t bg-slate-50 flex gap-2">
+                    {% csrf_token %}
+                    <input type="text" name="message" placeholder="Type a message..." class="flex-1 p-3 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none" required>
+                    <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-xl font-bold">Send</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

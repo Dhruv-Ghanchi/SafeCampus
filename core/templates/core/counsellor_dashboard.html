@@ -1,0 +1,123 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+            <h2 class="text-4xl font-black text-slate-900 tracking-tighter">Case Management</h2>
+            <p class="text-slate-500 font-medium">Prioritized by ML Sentiment Analysis & SOS Triggers</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <span class="bg-indigo-50 text-indigo-700 px-4 py-2 rounded-2xl border border-indigo-100 font-black text-sm uppercase tracking-widest">
+                Active Cases: {{ incidents.count }}
+            </span>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-[2rem] shadow-xl shadow-slate-200/50 overflow-hidden border border-slate-100">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-slate-50 border-b border-slate-100">
+                    <tr class="text-[10px] uppercase font-black text-slate-400 tracking-widest">
+                        <th class="p-6">Token & Priority</th>
+                        <th class="p-6">Reporter</th>
+                        <th class="p-6">Incident Title & Evidence</th>
+                        <th class="p-6">Sentiment</th>
+                        <th class="p-6 text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                    {% for incident in incidents %}
+                    <tr class="group transition-all hover:bg-slate-50/80 
+                        {% if incident.is_emergency %}bg-rose-50/50 animate-pulse{% elif incident.sentiment_score <= -0.6 %}bg-rose-50/20{% endif %}">
+                        
+                        <td class="p-6">
+                            <div class="flex items-center gap-3">
+                                <span class="font-mono font-black text-sm py-1 px-3 rounded-lg bg-white border shadow-sm
+                                    {% if incident.is_emergency or incident.sentiment_score <= -0.6 %}text-rose-600 border-rose-200{% else %}text-indigo-600 border-slate-200{% endif %}">
+                                    #{{ incident.case_token|default:"None" }}
+                                </span>
+                                {% if incident.is_emergency %}
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="flex h-2.5 w-2.5 rounded-full bg-rose-600 animate-ping"></span>
+                                        <span class="text-[10px] font-black text-rose-600 uppercase tracking-widest">Emergency SOS</span>
+                                    </div>
+                                {% elif incident.sentiment_score <= -0.6 %}
+                                    <span class="text-[9px] font-black text-rose-400 uppercase tracking-tighter">High Distress</span>
+                                {% endif %}
+                            </div>
+                        </td>
+
+                        <td class="p-6">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-500 border border-white shadow-sm">
+                                    {% if incident.is_anonymous and not incident.is_identity_revealed %}?{% else %}{{ incident.reporter.username|slice:":1"|upper }}{% endif %}
+                                </div>
+                                <span class="text-sm font-bold text-slate-700">
+                                    {% if incident.is_anonymous and not incident.is_identity_revealed %}
+                                        <span class="text-slate-400 italic font-medium">Anonymous</span>
+                                    {% else %}
+                                        {{ incident.reporter.username }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </td>
+
+                        <td class="p-6">
+                            <div class="flex flex-col gap-2">
+                                <div>
+                                    <p class="text-sm font-black text-slate-900">{{ incident.title|truncatechars:40 }}</p>
+                                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">{{ incident.reported_at|date:"M d, Y • H:i" }}</p>
+                                </div>
+
+                                {% if incident.voice_recording %}
+                                <div class="mt-1 flex items-center gap-3 bg-white/80 p-2 rounded-xl border border-rose-100 w-fit">
+                                    <span class="text-lg">🎙️</span>
+                                    <audio controls class="h-8 w-48">
+                                        <source src="{{ incident.voice_recording.url }}" type="audio/wav">
+                                        Your browser does not support the audio element.
+                                    </audio>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </td>
+
+                        <td class="p-6">
+                            <div class="flex flex-col gap-1">
+                                <div class="w-24 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                    {% widthratio incident.sentiment_score|add:"1" 2 100 as percent %}
+                                    <div class="h-full {% if incident.sentiment_score < 0 %}bg-rose-500{% else %}bg-emerald-500{% endif %}" 
+                                         style="width: {{ percent }}%"></div>
+                                </div>
+                                <span class="text-[10px] font-black {% if incident.sentiment_score < 0 %}text-rose-600{% else %}text-emerald-600{% endif %}">
+                                    Score: {{ incident.sentiment_score|floatformat:2 }}
+                                </span>
+                            </div>
+                        </td>
+
+                        <td class="p-6 text-right">
+                            <a href="{% url 'view_incident' incident.id %}" 
+                               class="inline-flex items-center gap-2 bg-slate-900 text-white px-5 py-2.5 rounded-xl text-xs font-black tracking-widest hover:bg-indigo-600 hover:shadow-lg hover:shadow-indigo-200 transition-all uppercase">
+                                <span>Manage</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="p-20 text-center">
+                            <div class="flex flex-col items-center gap-3">
+                                <span class="text-4xl">📁</span>
+                                <p class="text-slate-400 font-bold">No incidents in the queue. All clear!</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

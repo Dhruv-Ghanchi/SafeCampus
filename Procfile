@@ -1,0 +1,1 @@
+web: gunicorn safecampus_main.wsgi

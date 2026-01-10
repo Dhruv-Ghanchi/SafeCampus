@@ -1,0 +1,37 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto text-center">
+    <h1 class="text-5xl font-extrabold text-gray-900 mb-6 leading-tight">
+        A Safe Environment <br><span class="text-rose-600">for Every Woman.</span>
+    </h1>
+    
+    <p class="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
+        SafeCampus provides a secure, anonymous portal to report harassment and access institutional support. We stand for accountability and safety in our community.
+    </p>
+    
+    <div class="mb-16">
+        <a href="{% url 'report_incident' %}" class="bg-rose-600 text-white px-10 py-4 rounded-xl font-bold text-lg shadow-lg hover:bg-rose-700 hover:scale-105 transition transform inline-block">
+            Report an Incident Securely
+        </a>
+    </div>
+    
+    <div class="grid md:grid-cols-2 gap-8 text-left">
+        <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+            <div class="w-12 h-12 bg-rose-100 rounded-lg flex items-center justify-center mb-4">
+                <svg class="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Anonymous Reporting</h3>
+            <p class="text-gray-500 leading-relaxed">Submit reports without revealing your identity. Your privacy is protected by our core architecture.</p>
+        </div>
+
+        <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">SDG 5 Alignment</h3>
+            <p class="text-gray-500 leading-relaxed">Directly contributing to the UN goal of eliminating all forms of violence against women in public and private spaces.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

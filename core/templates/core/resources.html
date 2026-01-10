@@ -1,0 +1,70 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="max-w-4xl mx-auto py-10 space-y-12">
+    
+    <div class="bg-rose-50 p-8 rounded-3xl border border-rose-100">
+        <h2 class="text-2xl font-black text-rose-700 mb-4">UN SDG 5: Gender Equality</h2>
+        <p class="text-rose-900 leading-relaxed">
+            SafeCampus is built to support **Target 5.2**: Eliminate all forms of violence against all women and girls in the public and private spheres, including trafficking and sexual and other types of exploitation.
+        </p>
+        <div class="mt-4 flex gap-4">
+            <span class="bg-rose-600 text-white px-3 py-1 rounded-full text-xs font-bold uppercase">Institutional Accountability</span>
+            <span class="bg-rose-600 text-white px-3 py-1 rounded-full text-xs font-bold uppercase">Safe Spaces</span>
+        </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-8">
+        <div class="bg-white p-6 rounded-2xl shadow-sm border">
+            <h3 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <span class="bg-indigo-100 text-indigo-600 p-1 rounded">⚖️</span> 
+                POSH Policy (ICC)
+            </h3>
+            <p class="text-sm text-gray-600 mb-4">The Sexual Harassment of Women at Workplace Act (2013) ensures that every institution has an Internal Complaints Committee (ICC).</p>
+            <ul class="text-xs space-y-2 text-gray-500">
+                <li class="flex items-start gap-2"><span>•</span> Inquiry must be completed within 90 days.</li>
+                <li class="flex items-start gap-2"><span>•</span> Confidentiality of the victim is a legal right.</li>
+                <li class="flex items-start gap-2"><span>•</span> Protection against retaliation is guaranteed.</li>
+            </ul>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow-sm border">
+            <h3 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <span class="bg-emerald-100 text-emerald-600 p-1 rounded">🛡️</span> 
+                Your Legal Protections
+            </h3>
+            <p class="text-sm text-gray-600 mb-4">Know the sections of the law that protect you from digital and physical harassment.</p>
+            <ul class="text-xs space-y-2 text-gray-500">
+                <li class="flex items-start gap-2"><span>•</span> <strong>Section 354D:</strong> Protection against Stalking.</li>
+                <li class="flex items-start gap-2"><span>•</span> <strong>Section 509:</strong> Insult to modesty of a woman.</li>
+                <li class="flex items-start gap-2"><span>•</span> <strong>IT Act 66E:</strong> Violation of privacy (digital).</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-3xl border overflow-hidden shadow-sm">
+        <div class="p-6 bg-gray-900 text-white">
+            <h3 class="font-bold">24/7 Emergency Directory</h3>
+        </div>
+        <div class="divide-y">
+            <div class="p-4 flex justify-between items-center">
+                <span class="text-sm font-medium">National Women Helpline</span>
+                <span class="font-mono font-black text-rose-600">181</span>
+            </div>
+            <div class="p-4 flex justify-between items-center">
+                <span class="text-sm font-medium">Cyber Crime Cell</span>
+                <span class="font-mono font-black text-rose-600">1930</span>
+            </div>
+            <div class="p-4 flex justify-between items-center">
+                <span class="text-sm font-medium">Police (Emergency)</span>
+                <span class="font-mono font-black text-rose-600">112 / 100</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center">
+        <a href="{% url 'report_incident' %}" class="bg-rose-600 text-white px-10 py-4 rounded-2xl font-black shadow-xl shadow-rose-200 hover:scale-105 transition inline-block">
+            I Need to File a Report
+        </a>
+    </div>
+</div>
+{% endblock %}

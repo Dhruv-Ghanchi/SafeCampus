@@ -1,0 +1,58 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <div class="flex justify-between items-center mb-8">
+        <h2 class="text-3xl font-bold text-gray-800">My Reports & Tracking</h2>
+        <a href="{% url 'report_incident' %}" class="bg-rose-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-rose-700">
+            + Report New Incident
+        </a>
+    </div>
+
+    <div class="space-y-6">
+        {% for report in reports %}
+        <div class="bg-white rounded-xl shadow-sm border p-6">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <span class="text-xs font-bold text-rose-600 uppercase tracking-widest">Case #{{ report.case_token }}</span>
+                    <h3 class="text-xl font-bold text-gray-900">{{ report.title }}</h3>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="px-3 py-1 rounded-full text-xs font-bold 
+                        {% if report.status == 'New' %}bg-blue-100 text-blue-700
+                        {% elif report.status == 'Resolved' %}bg-green-100 text-green-700
+                        {% else %}bg-yellow-100 text-yellow-700{% endif %}">
+                        {{ report.status }}
+                    </span>
+                    <a href="{% url 'student_incident_detail' report.id %}" class="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-md font-bold text-xs hover:bg-indigo-100 transition">
+                        View Details & Chat →
+                    </a>
+                </div>
+            </div>
+
+            {% if report.is_anonymous %}
+            <div class="bg-rose-50 border border-rose-100 p-4 rounded-lg mb-4">
+                <p class="text-rose-800 text-sm mb-3">
+                    <strong>Anonymous Report:</strong> Reveal identity to enable secure chat with a counsellor.
+                </p>
+                <form action="{% url 'reveal_identity' report.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="bg-rose-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-rose-700">
+                        Reveal Identity Now
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+
+            <div class="text-sm text-gray-500 flex gap-4">
+                <span><strong>Location:</strong> {{ report.location }}</span>
+                <span><strong>Date:</strong> {{ report.reported_at|date:"M d, Y" }}</span>
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center py-20 bg-white rounded-xl border-2 border-dashed">
+            <p class="text-gray-400">You haven't filed any reports yet.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

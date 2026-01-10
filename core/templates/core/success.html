@@ -1,0 +1,63 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto py-12 px-4">
+    <div class="bg-white rounded-[3rem] shadow-2xl overflow-hidden border-4 transition-all
+        {% if is_critical %}border-rose-500 animate-pulse{% else %}border-emerald-100{% endif %}">
+        
+        <div class="{% if is_critical %}bg-rose-600{% else %}bg-emerald-500{% endif %} p-10 text-center text-white">
+            <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-white/50">
+                <span class="text-4xl">{% if is_critical %}⚠️{% else %}✅{% endif %}</span>
+            </div>
+            <h2 class="text-3xl font-black tracking-tight">
+                {% if is_critical %}Emergency Prioritized{% else %}Report Successfully Logged{% endif %}
+            </h2>
+            <p class="text-white/80 font-bold mt-2 tracking-widest uppercase text-sm">
+                Case Token: <span class="bg-white/20 px-3 py-1 rounded-lg ml-1">{{ incident.case_token }}</span>
+            </p>
+        </div>
+
+        <div class="p-10 space-y-8">
+            <div class="bg-indigo-50 border-l-8 border-indigo-500 p-6 rounded-2xl">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="text-indigo-500 text-xl">🤖</span>
+                    <h4 class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">SafeCampus AI Assistant</h4>
+                </div>
+                <p class="text-indigo-900 font-medium italic text-lg leading-relaxed">
+                    "{{ ai_note }}"
+                </p>
+            </div>
+
+            <div>
+                <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Emergency Resources</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% for link in helplines %}
+                    <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-center gap-4 hover:border-indigo-200 transition-colors">
+                        <span class="text-2xl">{{ link.icon }}</span>
+                        <div>
+                            <p class="text-[10px] font-black text-slate-400 uppercase">{{ link.name }}</p>
+                            <p class="text-lg font-black text-slate-900">{{ link.number }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-4 pt-4">
+                <a href="{% url 'student_dashboard' %}" 
+                   class="flex-1 bg-slate-900 text-white text-center py-4 rounded-2xl font-black shadow-lg shadow-slate-200 hover:bg-indigo-600 transition-all uppercase tracking-widest text-xs">
+                    View My Dashboard
+                </a>
+                <button onclick="window.print()" 
+                        class="flex-1 bg-white border-2 border-slate-100 text-slate-600 py-4 rounded-2xl font-black hover:bg-slate-50 transition-all uppercase tracking-widest text-xs">
+                    Save Receipt
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <p class="text-center text-slate-400 text-xs font-medium mt-8">
+        Your data is encrypted. Always remember: in an immediate physical threat, please contact campus security directly via the SOS button.
+    </p>
+</div>
+{% endblock %}
