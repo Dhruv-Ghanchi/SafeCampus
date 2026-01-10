@@ -12,14 +12,14 @@
     <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
         <div class="p-4 bg-gray-800 text-white text-xs font-bold uppercase tracking-widest">Read Only Mode</div>
         <div class="p-6 h-96 overflow-y-auto space-y-4 bg-gray-50">
-            {% for msg in incident.messages.all %}
+            {% for msg in messages %}
                 <div class="flex flex-col {% if msg.sender.role == 'student' %}items-start{% else %}items-end{% endif %}">
                     <div class="max-w-md p-3 rounded-lg text-sm {% if msg.sender.role == 'student' %}bg-white border text-gray-800{% else %}bg-indigo-600 text-white{% endif %}">
-                        <div class="flex justify-between items-center gap-4 mb-1">
+                        <div class="flex justify-between items-center gap-4">
                             <p class="font-black text-[9px] uppercase opacity-75">{{ msg.sender.username }} ({{ msg.sender.role }})</p>
                             <p class="text-[9px] opacity-60">{{ msg.created_at|date:"M d, H:i" }}</p>
                         </div>
-                        <p>{{ msg.text }}</p>
+                        <p class="mt-1">{{ msg.text }}</p>
                     </div>
                 </div>
             {% empty %}
