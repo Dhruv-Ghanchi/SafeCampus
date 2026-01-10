@@ -203,5 +203,5 @@ def admin_view_chat(request, incident_id):
         return redirect('home')
     incident = get_object_or_404(Incident, id=incident_id)
     # Fetch all messages linked to this incident to display in the admin chat monitor
-    messages = Message.objects.filter(incident=incident).order_by('timestamp')
+    messages = Message.objects.filter(incident=incident).order_by('created_at')
     return render(request, 'core/admin_chat_view.html', {'incident': incident, 'messages': messages})
