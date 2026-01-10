@@ -22,7 +22,6 @@ kiwisolver==1.4.9
 langcodes==3.5.1
 locate==1.1.1
 matplotlib==3.10.8
-mediapipe==0.10.9
 msgpack==1.1.2
 nltk==3.9.2
 numpy==2.2.6
