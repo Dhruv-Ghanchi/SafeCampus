@@ -15,8 +15,11 @@
             {% for msg in incident.messages.all %}
                 <div class="flex flex-col {% if msg.sender.role == 'student' %}items-start{% else %}items-end{% endif %}">
                     <div class="max-w-md p-3 rounded-lg text-sm {% if msg.sender.role == 'student' %}bg-white border text-gray-800{% else %}bg-indigo-600 text-white{% endif %}">
-                        <p class="font-black text-[9px] uppercase opacity-75">{{ msg.sender.username }} ({{ msg.sender.role }})</p>
-                        {{ msg.text }}
+                        <div class="flex justify-between items-center gap-4 mb-1">
+                            <p class="font-black text-[9px] uppercase opacity-75">{{ msg.sender.username }} ({{ msg.sender.role }})</p>
+                            <p class="text-[9px] opacity-60">{{ msg.created_at|date:"M d, H:i" }}</p>
+                        </div>
+                        <p>{{ msg.text }}</p>
                     </div>
                 </div>
             {% empty %}
