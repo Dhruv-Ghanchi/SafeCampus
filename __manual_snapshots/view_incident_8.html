@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SafeCampus | Student Safety Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        #nav-menu { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .menu-open { overflow: hidden; }
+        /* Custom scrollbar for better UI */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen flex flex-col pb-20 md:pb-0">
+
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:inline-block absolute left-4 top-4 bg-indigo-600 text-white px-3 py-2 rounded-md z-[200]">Skip to content</a>
+
+    <nav class="glass border-b border-slate-100 py-4 px-6 md:px-12 sticky top-0 z-[90]">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="/home/" class="text-2xl font-black text-slate-900 tracking-tighter">
+                Safe<span class="text-indigo-600">Campus</span>
+            </a>
+            
+            <div class="hidden md:flex items-center gap-8">
+                
+                    
+                        <a href="/counsellor/" class="text-sm font-bold text-slate-600 hover:text-indigo-600 transition">Counsellor Hub</a>
+                    
+
+                    <a href="/report/" class="text-sm font-bold text-slate-600 hover:text-rose-600 transition">File Report</a>
+
+                    <div class="h-4 w-[1px] bg-slate-200"></div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Hi, manual_counsellor</span>
+                        <a href="/logout/" class="bg-slate-900 text-white px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-rose-600 transition shadow-lg shadow-slate-200">Logout</a>
+                    </div>
+                
+            </div>
+
+            <button onclick="toggleMenu()" class="md:hidden p-2 bg-slate-100 rounded-xl">
+                <svg id="menu-icon" class="w-6 h-6 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+
+        <div id="nav-menu" class="hidden fixed inset-0 top-[73px] bg-white z-[85] p-8 flex-col gap-6 md:hidden">
+            
+                <p class="text-xs font-black text-slate-400 uppercase tracking-widest">Navigation</p>
+                <a href="/home/" class="text-3xl font-black text-slate-900">Dashboard</a>
+                <a href="/report/" class="text-3xl font-black text-slate-900">New Report</a>
+                <div class="mt-auto">
+                    <a href="/logout/" class="block w-full text-center py-5 bg-rose-50 text-rose-600 rounded-2xl font-black text-lg">Logout</a>
+                </div>
+            
+        </div>
+    </nav>
+
+    <main class="flex-grow w-full max-w-7xl mx-auto py-6">
+        
+        
+<div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 py-4 md:py-10 px-4">
+    
+    <div class="lg:col-span-4 space-y-6">
+        <div class="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 p-8 sticky top-24">
+            <a href="/counsellor/" class="inline-flex items-center text-[10px] text-slate-400 font-black uppercase mb-6">
+                <span class="mr-2">←</span> Back to Command Center
+            </a>
+            
+            <div class="mb-8">
+                <h2 class="text-3xl font-black text-slate-900 tracking-tighter">EMERGENCY SOS VOICE LOG</h2>
+                <span class="font-mono text-[10px] bg-slate-900 text-white px-3 py-1 rounded-lg">#HRKJKE</span>
+            </div>
+
+            <form method="post" id="status-update-form" class="pt-6 border-t border-slate-100 space-y-5">
+                <input type="hidden" name="csrfmiddlewaretoken" value="QCpNSpI9FY8Mr52bfcDkNgvizUleynO0btazORQwJAzxjDt2HrAgr8bfv7g49c7e">
+                <div>
+                    <label class="text-[10px] text-slate-400 uppercase font-black block mb-2">Internal Staff Log</label>
+                    <textarea name="internal_notes" rows="3" class="w-full p-4 border border-slate-200 rounded-2xl text-xs bg-slate-50"></textarea>
+                </div>
+
+                <div>
+                    <label class="text-[10px] text-slate-400 uppercase font-black block mb-2">Set Case Status</label>
+                    <select name="status" id="status-select" class="w-full p-3 border border-slate-200 rounded-xl text-xs font-bold bg-slate-50">
+                        <option value="Reported" >Reported</option>
+                        <option value="Under Review" >Under Review</option>
+                        <option value="Action Taken" >Action Taken</option>
+                        <option value="Resolved" >Resolved</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="w-full bg-slate-900 text-white py-4 rounded-2xl text-xs font-black uppercase hover:bg-indigo-600 transition-all">
+                    Update Case Status
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="lg:col-span-8">
+        <div class="bg-white rounded-[3rem] shadow-2xl border border-slate-100 overflow-hidden flex flex-col h-[750px]">
+            <div class="px-8 py-6 bg-slate-900 text-white">
+                <h3 class="font-black text-sm uppercase tracking-widest">Incident Discussion</h3>
+            </div>
+
+            <div id="chat-window" class="flex-1 p-6 overflow-y-auto space-y-6 bg-slate-50/50 no-scrollbar" aria-live="polite" aria-atomic="false">
+                
+                    <div class="text-center text-slate-400 font-bold uppercase">No messages yet — start the conversation</div>
+                
+                
+            </div>
+
+            <div class="p-6 bg-white border-t border-slate-100">
+                
+                    <form method="post" enctype="multipart/form-data" class="space-y-4">
+                        <input type="hidden" name="csrfmiddlewaretoken" value="QCpNSpI9FY8Mr52bfcDkNgvizUleynO0btazORQwJAzxjDt2HrAgr8bfv7g49c7e">
+
+                        <div class="bg-slate-50 p-4 rounded-2xl border-2 border-dashed border-slate-200">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Upload Evidence:</label>
+                            <input type="file" name="attachment" class="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                        </div>
+
+                        <div class="flex gap-4">
+                            <input type="text" name="message" autocomplete="off" placeholder="Type response..." class="flex-1 px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                            <button type="submit" class="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase hover:bg-slate-900 transition-all">
+                                Send
+                            </button>
+                        </div>
+                    </form>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="resolve-modal" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+    <div class="bg-white rounded-[3rem] max-w-md w-full p-10 text-center shadow-2xl">
+        <h3 class="text-2xl font-black text-slate-900 mb-2">Resolve Case?</h3>
+        <div class="flex flex-col gap-3 mt-8">
+            <button onclick="confirmResolution()" class="w-full bg-emerald-600 text-white py-4 rounded-2xl text-xs font-black uppercase tracking-widest">Confirm & Resolve</button>
+            <button onclick="document.getElementById('resolve-modal').classList.add('hidden')" class="w-full bg-slate-100 text-slate-400 py-4 rounded-2xl text-xs font-black uppercase tracking-widest">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const chatWindow = document.getElementById('chat-window');
+    if (chatWindow) chatWindow.scrollTop = chatWindow.scrollHeight;
+
+    const statusSelect = document.getElementById('status-select');
+    const statusForm = document.getElementById('status-update-form');
+    const resolveModal = document.getElementById('resolve-modal');
+    let originalStatus = statusSelect ? statusSelect.value : '';
+
+    if (statusForm) {
+        statusForm.onsubmit = function(e) {
+            if (statusSelect.value === 'Resolved' && originalStatus !== 'Resolved') {
+                e.preventDefault();
+                resolveModal.classList.remove('hidden');
+            }
+        };
+    }
+
+    function confirmResolution() {
+        statusForm.submit();
+    }
+</script>
+
+<script>
+    // Improve send UX: preview filename and Enter-to-send
+    const fileInputV = document.querySelector('#status-update-form + div input[type="file"], form input[type="file"]');
+    const messageInputV = document.querySelector('form input[name="message"]');
+    const sendBtnV = document.querySelector('form button[type="submit"]');
+    const filePreviewV = document.getElementById('file-name-preview');
+
+    if (fileInputV) {
+        fileInputV.onchange = function() {
+            if (this.files.length > 0 && filePreviewV) {
+                filePreviewV.innerText = 'Selected: ' + this.files[0].name;
+                filePreviewV.classList.remove('hidden');
+            }
+            if (sendBtnV) sendBtnV.disabled = false;
+        };
+    }
+
+    if (messageInputV) {
+        messageInputV.addEventListener('keyup', (e) => {
+            const val = messageInputV.value.trim();
+            if (sendBtnV) sendBtnV.disabled = (val === '' && (!fileInputV || fileInputV.files.length === 0));
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if (val !== '' || (fileInputV && fileInputV.files.length > 0)) sendBtnV.click();
+            }
+        });
+    }
+</script>
+
+<style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
+
+    </main>
+
+    
+    <div class="md:hidden fixed bottom-6 left-6 right-6 z-[100]">
+        <nav class="bg-slate-900/95 backdrop-blur-xl rounded-[2.5rem] border border-white/10 shadow-2xl h-16 flex items-center justify-around px-2">
+            <a href="/home/" class="flex flex-col items-center justify-center w-12 h-12 rounded-full text-white/50 hover:text-white transition">
+                <i class="fas fa-chart-pie text-lg"></i>
+                <span class="text-[8px] font-black uppercase mt-0.5">Stats</span>
+            </a>
+            
+            <a href="/report/" class="flex items-center justify-center w-14 h-14 bg-indigo-600 rounded-full border-4 border-slate-50 -mt-10 shadow-xl shadow-indigo-500/40 active:scale-90 transition-transform">
+                <i class="fas fa-plus text-white text-xl"></i>
+            </a>
+
+            <a href="#" class="flex flex-col items-center justify-center w-12 h-12 rounded-full text-white/50 hover:text-white transition">
+                <i class="fas fa-comment-dots text-lg"></i>
+                <span class="text-[8px] font-black uppercase mt-0.5">Chat</span>
+            </a>
+        </nav>
+    </div>
+    
+
+    
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('nav-menu');
+            const body = document.body;
+            menu.classList.toggle('hidden');
+            menu.classList.toggle('flex');
+            body.classList.toggle('menu-open');
+        }
+
+        // SOS Script Logic
+        const sosBtn = document.getElementById('sosBtn');
+        const modal = document.getElementById('sosModal');
+        const callUI = document.getElementById('callUI');
+        const recordUI = document.getElementById('recordUI');
+        let mediaRecorder;
+        let audioChunks = [];
+
+        if(sosBtn) {
+            sosBtn.onclick = () => {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    if(!modal.classList.contains('hidden')) startVoicemail();
+                }, 4000);
+            };
+        }
+
+        function closeSOS() { modal.classList.add('hidden'); }
+
+        async function startVoicemail() {
+            callUI.classList.add('hidden');
+            recordUI.classList.remove('hidden');
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.start();
+                
+                let sec = 0;
+                setInterval(() => {
+                    sec++;
+                    let m = Math.floor(sec/60);
+                    let s = sec%60;
+                    document.getElementById('timer').innerText = `${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
+                }, 1000);
+
+                mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
+                mediaRecorder.onstop = async () => {
+                    const blob = new Blob(audioChunks, { type: 'audio/wav' });
+                    const formData = new FormData();
+                    formData.append('audio_data', blob);
+                    formData.append('csrfmiddlewaretoken', 'QCpNSpI9FY8Mr52bfcDkNgvizUleynO0btazORQwJAzxjDt2HrAgr8bfv7g49c7e');
+                    const response = await fetch('/handle-sos/', { method: 'POST', body: formData });
+                    if (response.ok) {
+                        modal.innerHTML = "<div class='p-12 text-center'><h2 class='text-3xl font-black text-emerald-600 mb-2'>Sent.</h2><p class='text-slate-500 font-bold'>Authorities have been notified.</p></div>";
+                        setTimeout(() => location.reload(), 2000);
+                    }
+                };
+            } catch (err) {
+                alert("Microphone required for SOS.");
+                closeSOS();
+            }
+        }
+
+        const stopBtn = document.getElementById('stopRecord');
+        if(stopBtn) stopBtn.onclick = () => { if(mediaRecorder) mediaRecorder.stop(); };
+    </script>
+    
+</body>
+</html>

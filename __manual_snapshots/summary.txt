@@ -1,0 +1,8 @@
+('root_status', 302)
+('student_dashboard', 200)
+('report_page', 200)
+('counsellor_dashboard', 200)
+('admin_portal', 200)
+('counsellor_view_incident', 200)
+('counsellor_admin_chat', 403)
+('admin_admin_chat', 200)

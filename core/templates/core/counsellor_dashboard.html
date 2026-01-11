@@ -1,116 +1,149 @@
 {% extends 'core/base.html' %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-8">
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+<style>
+    /* Utility to hide scrollbars while allowing swipe on filter bar */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
+
+<div class="max-w-7xl mx-auto px-4 py-6 md:py-10 space-y-8">
+    
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
         <div>
-            <h2 class="text-4xl font-black text-slate-900 tracking-tighter">Case Management</h2>
-            <p class="text-slate-500 font-medium">Prioritized by ML Sentiment Analysis & SOS Triggers</p>
+            <div class="flex items-center gap-2 mb-2">
+                <span class="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></span>
+                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Live Case Monitor</span>
+            </div>
+            <h2 class="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter">Counsellor <span class="text-indigo-600">Portal</span></h2>
+            <p class="text-slate-500 font-medium mt-1">AI-Powered Sentiment Analysis Priority Queue</p>
         </div>
-        <div class="flex items-center gap-3">
-            <span class="bg-indigo-50 text-indigo-700 px-4 py-2 rounded-2xl border border-indigo-100 font-black text-sm uppercase tracking-widest">
-                Active Cases: {{ incidents.count }}
-            </span>
+        
+        <div class="flex gap-3 w-full md:w-auto">
+            <div class="flex-1 md:flex-none bg-white border border-slate-100 p-4 rounded-[2rem] shadow-sm text-center">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Cases</p>
+                <p class="text-2xl font-black text-slate-900">{{ incidents.count }}</p>
+            </div>
+            <div class="flex-1 md:flex-none bg-indigo-600 p-4 rounded-[2rem] shadow-lg shadow-indigo-100 text-center text-white">
+                <p class="text-[10px] font-black text-indigo-200 uppercase tracking-widest">Status</p>
+                <p class="text-2xl font-black italic">Active</p>
+            </div>
         </div>
     </div>
 
-    <div class="bg-white rounded-[2rem] shadow-xl shadow-slate-200/50 overflow-hidden border border-slate-100">
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <thead class="bg-slate-50 border-b border-slate-100">
-                    <tr class="text-[10px] uppercase font-black text-slate-400 tracking-widest">
-                        <th class="p-6">Token & Priority</th>
+    <div class="flex flex-col md:flex-row gap-4 justify-between items-center">
+        <div class="flex gap-2 overflow-x-auto no-scrollbar w-full md:w-auto pb-2 md:pb-0">
+            <a href="?filter=all" 
+               class="px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap
+               {% if active_filter == 'all' or not active_filter %}bg-slate-900 text-white shadow-lg shadow-slate-200{% else %}bg-white border border-slate-200 text-slate-500 hover:bg-slate-50{% endif %}">
+                All Reports
+            </a>
+
+            <a href="?filter=critical" 
+               class="px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap
+               {% if active_filter == 'critical' %}bg-rose-600 text-white shadow-lg shadow-rose-200{% else %}bg-white border border-slate-200 text-rose-600 hover:bg-rose-50{% endif %}">
+                Critical SOS
+            </a>
+
+            <a href="?filter=pending" 
+               class="px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap
+               {% if active_filter == 'pending' %}bg-indigo-600 text-white shadow-lg shadow-indigo-200{% else %}bg-white border border-slate-200 text-slate-500 hover:bg-slate-50{% endif %}">
+                Pending Review
+            </a>
+        </div>
+
+        <form method="GET" class="relative w-full md:w-80 flex items-center gap-2" role="search" aria-label="Search cases">
+            <input type="hidden" name="filter" value="{{ active_filter }}">
+            <div class="relative group flex-1">
+                <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                    <svg class="w-4 h-4 text-slate-400 group-focus-within:text-indigo-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+                  <input type="text" name="q" value="{{ search_query|default:'' }}" aria-label="Search token or student" 
+                      placeholder="Search Token or Student..." 
+                      class="w-full pl-11 pr-4 py-2.5 bg-white rounded-2xl border-none ring-1 ring-slate-200 focus:ring-2 focus:ring-indigo-500 text-[10px] font-black uppercase tracking-widest transition-all shadow-sm">
+            </div>
+
+            {% if search_query %}
+                <a href="?filter={{ active_filter }}" 
+                   class="p-2.5 bg-rose-50 text-rose-500 rounded-xl hover:bg-rose-500 hover:text-white transition-all shadow-sm"
+                   title="Clear Search">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </a>
+            {% endif %}
+        </form>
+    </div>
+
+    <div class="bg-white rounded-[3rem] shadow-xl shadow-slate-200/50 overflow-hidden border border-slate-50">
+        <div class="hidden md:block overflow-x-auto">
+            <table class="w-full text-left border-collapse" role="table" aria-label="Counsellor case list">
+                <thead>
+                    <tr class="bg-slate-50/50 text-[10px] uppercase font-black text-slate-400 tracking-widest">
+                        <th class="p-6">Case</th>
                         <th class="p-6">Reporter</th>
-                        <th class="p-6">Incident Title & Evidence</th>
+                        <th class="p-6">Safety</th>
                         <th class="p-6">Sentiment</th>
-                        <th class="p-6 text-right">Action</th>
+                        <th class="p-6 text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-50">
                     {% for incident in incidents %}
-                    <tr class="group transition-all hover:bg-slate-50/80 
-                        {% if incident.is_emergency %}bg-rose-50/50 animate-pulse{% elif incident.sentiment_score <= -0.6 %}bg-rose-50/20{% endif %}">
-                        
-                        <td class="p-6">
-                            <div class="flex items-center gap-3">
-                                <span class="font-mono font-black text-sm py-1 px-3 rounded-lg bg-white border shadow-sm
-                                    {% if incident.is_emergency or incident.sentiment_score <= -0.6 %}text-rose-600 border-rose-200{% else %}text-indigo-600 border-slate-200{% endif %}">
-                                    #{{ incident.case_token|default:"None" }}
-                                </span>
-                                {% if incident.is_emergency %}
-                                    <div class="flex items-center gap-1.5">
-                                        <span class="flex h-2.5 w-2.5 rounded-full bg-rose-600 animate-ping"></span>
-                                        <span class="text-[10px] font-black text-rose-600 uppercase tracking-widest">Emergency SOS</span>
+                    <tr tabindex="0" aria-label="Case {{ incident.case_token|default:incident.id }}: {{ incident.title|truncatechars:60 }}" class="group transition-all {% if incident.is_emergency and incident.status != 'Resolved' %}bg-rose-50/60 border-l-4 border-rose-500{% else %}hover:bg-slate-50/80{% endif %}">
+                        <td class="p-6 align-top">
+                            <div class="flex items-start gap-4">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-3 mb-1">
+                                        <span class="font-mono font-black text-xs py-1 px-3 rounded-lg border {% if incident.is_emergency and incident.status != 'Resolved' %}bg-rose-100 border-rose-200 text-rose-600{% else %}bg-white border-slate-200 text-indigo-600 shadow-sm{% endif %}">#{{ incident.case_token|default:incident.id }}</span>
+                                        <div class="flex flex-col">
+                                            <p class="text-sm font-black text-slate-900">{{ incident.title|truncatechars:60 }}</p>
+                                            <p class="text-[10px] text-slate-400 font-bold uppercase">{{ incident.reported_at|timesince }} ago</p>
+                                        </div>
                                     </div>
-                                {% elif incident.sentiment_score <= -0.6 %}
-                                    <span class="text-[9px] font-black text-rose-400 uppercase tracking-tighter">High Distress</span>
-                                {% endif %}
-                            </div>
-                        </td>
-
-                        <td class="p-6">
-                            <div class="flex items-center gap-2">
-                                <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-500 border border-white shadow-sm">
-                                    {% if incident.is_anonymous and not incident.is_identity_revealed %}?{% else %}{{ incident.reporter.username|slice:":1"|upper }}{% endif %}
-                                </div>
-                                <span class="text-sm font-bold text-slate-700">
-                                    {% if incident.is_anonymous and not incident.is_identity_revealed %}
-                                        <span class="text-slate-400 italic font-medium">Anonymous</span>
-                                    {% else %}
-                                        {{ incident.reporter.username }}
+                                    {% if incident.is_emergency and incident.status != 'Resolved' %}
+                                        <div class="mt-2 inline-flex items-center gap-3">
+                                            <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span></span>
+                                            <span class="bg-rose-600 text-white text-[9px] font-black px-2 py-1 rounded-md">SOS ACTIVE</span>
+                                        </div>
                                     {% endif %}
-                                </span>
+                                </div>
                             </div>
                         </td>
 
-                        <td class="p-6">
-                            <div class="flex flex-col gap-2">
+                        <td class="p-6 align-top">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-500 border-2 border-white shadow-sm">{% if incident.is_anonymous and not incident.is_identity_revealed %}🔒{% else %}{{ incident.reporter.username|slice:":1"|upper }}{% endif %}</div>
                                 <div>
-                                    <p class="text-sm font-black text-slate-900">{{ incident.title|truncatechars:40 }}</p>
-                                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">{{ incident.reported_at|date:"M d, Y • H:i" }}</p>
+                                    <p class="text-sm font-black text-slate-800">{% if incident.is_anonymous and not incident.is_identity_revealed %}Anonymous{% else %}{{ incident.reporter.username }}{% endif %}</p>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Reporter</p>
                                 </div>
-
-                                {% if incident.voice_recording %}
-                                <div class="mt-1 flex items-center gap-3 bg-white/80 p-2 rounded-xl border border-rose-100 w-fit">
-                                    <span class="text-lg">🎙️</span>
-                                    <audio controls class="h-8 w-48">
-                                        <source src="{{ incident.voice_recording.url }}" type="audio/wav">
-                                        Your browser does not support the audio element.
-                                    </audio>
-                                </div>
-                                {% endif %}
                             </div>
                         </td>
 
-                        <td class="p-6">
-                            <div class="flex flex-col gap-1">
-                                <div class="w-24 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                    {% widthratio incident.sentiment_score|add:"1" 2 100 as percent %}
-                                    <div class="h-full {% if incident.sentiment_score < 0 %}bg-rose-500{% else %}bg-emerald-500{% endif %}" 
-                                         style="width: {{ percent }}%"></div>
+                        <td class="p-6 align-top">
+                            <span class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest {% if incident.is_emergency and incident.status != 'Resolved' %}bg-rose-600 text-white{% elif incident.status == 'Resolved' %}bg-emerald-100 text-emerald-600{% elif incident.status == 'Under Review' or incident.status == 'Action Taken' %}bg-amber-100 text-amber-600{% elif incident.status == 'New' %}bg-indigo-50 text-indigo-600{% else %}bg-slate-100 text-slate-500{% endif %}">{% if incident.is_emergency and incident.status != 'Resolved' %}CRITICAL SOS{% else %}{{ incident.status }}{% endif %}</span>
+                        </td>
+
+                        <td class="p-6 align-top">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-[10px] font-black uppercase {% if incident.sentiment_score < -0.4 %}text-rose-500{% else %}text-emerald-500{% endif %}">{% if incident.sentiment_score < -0.4 %}Distressed{% else %}Stable{% endif %}</span>
+                                    <span class="text-[10px] font-mono font-bold text-slate-400">{{ incident.sentiment_score|floatformat:2 }}</span>
                                 </div>
-                                <span class="text-[10px] font-black {% if incident.sentiment_score < 0 %}text-rose-600{% else %}text-emerald-600{% endif %}">
-                                    Score: {{ incident.sentiment_score|floatformat:2 }}
-                                </span>
+                                <div class="w-40 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                    {% widthratio incident.sentiment_score|add:1 2 100 as percent %}
+                                    <div class="h-full {% if incident.sentiment_score < -0.4 %}bg-rose-500{% else %}bg-emerald-500{% endif %}" style="width: {{ percent }}%"></div>
+                                </div>
                             </div>
                         </td>
 
-                        <td class="p-6 text-right">
-                            <a href="{% url 'view_incident' incident.id %}" 
-                               class="inline-flex items-center gap-2 bg-slate-900 text-white px-5 py-2.5 rounded-xl text-xs font-black tracking-widest hover:bg-indigo-600 hover:shadow-lg hover:shadow-indigo-200 transition-all uppercase">
-                                <span>Manage</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
-                                </svg>
-                            </a>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="5" class="p-20 text-center">
-                            <div class="flex flex-col items-center gap-3">
-                                <span class="text-4xl">📁</span>
-                                <p class="text-slate-400 font-bold">No incidents in the queue. All clear!</p>
+                        <td class="p-6 text-right align-top">
+                            <div class="flex items-center justify-end gap-3">
+                                <a href="{% url 'view_incident' incident.id %}" class="btn-primary inline-flex items-center gap-2 {% if incident.is_emergency and incident.status != 'Resolved' %}bg-rose-600 hover:bg-rose-700{% else %}bg-slate-900 hover:bg-indigo-600{% endif %} text-white px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all">Open</a>
+                                <button class="btn-secondary inline-flex items-center gap-2" data-assign="{{ incident.id }}" aria-label="Assign case {{ incident.case_token }} to me">Assign</button>
+                                <button class="btn-secondary inline-flex items-center gap-2" data-resolve="{{ incident.id }}" aria-label="Resolve case {{ incident.case_token }}">Resolve</button>
                             </div>
                         </td>
                     </tr>
@@ -118,6 +151,92 @@
                 </tbody>
             </table>
         </div>
+
+        <div class="md:hidden divide-y divide-slate-50">
+            {% for incident in incidents %}
+            <div class="p-6 {% if incident.is_emergency and incident.status != 'Resolved' %}bg-rose-50/60 border-l-4 border-rose-500{% endif %}">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-black px-3 py-1 bg-slate-100 rounded-full text-slate-500">#{{ incident.case_token|default:incident.id }}</span>
+                    {% if incident.is_emergency and incident.status != 'Resolved' %}
+                        <span class="text-[10px] font-black text-rose-600 animate-pulse">● SOS EMERGENCY</span>
+                    {% endif %}
+                </div>
+                <h3 class="text-lg font-black text-slate-900 mb-1">{{ incident.title|truncatechars:40 }}</h3>
+                <div class="flex gap-2 mb-6">
+                    <span class="text-[9px] font-black uppercase text-slate-400 tracking-widest">{{ incident.reported_at|timesince }} ago</span>
+                    <span class="text-[9px] font-black uppercase {% if incident.is_emergency and incident.status != 'Resolved' %}text-rose-600{% else %}text-indigo-600{% endif %} tracking-widest">{{ incident.status }}</span>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-[10px]">👤</div>
+                        <span class="text-xs font-bold text-slate-600">{% if incident.is_anonymous and not incident.is_identity_revealed %}Anonymous{% else %}{{ incident.reporter.username }}{% endif %}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <a href="{% url 'view_incident' incident.id %}" class="{% if incident.is_emergency and incident.status != 'Resolved' %}bg-rose-600{% else %}bg-slate-900{% endif %} text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase">{% if incident.is_emergency and incident.status != 'Resolved' %}RESPOND{% else %}View{% endif %}</a>
+                        <button class="bg-indigo-100 text-indigo-700 px-3 py-2 rounded-xl text-xs font-black" data-assign-mobile="{{ incident.id }}">Assign</button>
+                        <button class="bg-emerald-50 text-emerald-700 px-3 py-2 rounded-xl text-xs font-black" data-resolve-mobile="{{ incident.id }}">Resolve</button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if not incidents %}
+        <div class="p-20 text-center">
+            <div class="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span class="text-3xl">✅</span>
+            </div>
+            <p class="text-slate-400 font-black uppercase tracking-widest text-xs">No cases found in this category.</p>
+        </div>
+        {% endif %}
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Quick action handlers: Assign / Resolve (client-side POST using fetch + CSRF)
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+}
+const csrftoken = getCookie('csrftoken');
+
+document.addEventListener('click', async (e) => {
+    const assignId = e.target.getAttribute('data-assign') || e.target.getAttribute('data-assign-mobile');
+    const resolveId = e.target.getAttribute('data-resolve') || e.target.getAttribute('data-resolve-mobile');
+    if (assignId) {
+        e.preventDefault();
+        try {
+            const resp = await fetch(`/incident/${assignId}/assign/`, { method: 'POST', headers: {'X-CSRFToken': csrftoken} });
+            if (resp.ok) {
+                location.reload();
+            } else alert('Assign failed');
+        } catch (err) { console.error(err); alert('Network error'); }
+    }
+    if (resolveId) {
+        e.preventDefault();
+        if (!confirm('Mark this case as resolved?')) return;
+        try {
+            const resp = await fetch(`/incident/${resolveId}/resolve/`, { method: 'POST', headers: {'X-CSRFToken': csrftoken} });
+            if (resp.ok) {
+                location.reload();
+            } else alert('Resolve failed');
+        } catch (err) { console.error(err); alert('Network error'); }
+    }
+});
+
+// Keyboard support: Enter on focused table row opens the first action link
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        const el = document.activeElement;
+        if (el && el.tagName === 'TR') {
+            const link = el.querySelector('a');
+            if (link) { link.click(); }
+        }
+    }
+});
+</script>
 {% endblock %}

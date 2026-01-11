@@ -6,7 +6,6 @@ class User(AbstractUser):
         ('student', 'Student'),
         ('counsellor', 'Counsellor'),
         ('admin', 'Admin'),
-        ('security', 'Security Staff'),
     )
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='student')
 
@@ -51,9 +50,10 @@ class Incident(models.Model):
         return f"{self.case_token} - {self.title}"
 
 class Message(models.Model):
-    incident = models.ForeignKey(Incident, on_delete=models.CASCADE, related_name='messages')
-    sender = models.ForeignKey(User, on_delete=models.CASCADE)
-    text = models.TextField()
+    incident = models.ForeignKey(Incident, on_delete=models.CASCADE) # Fixed here
+    sender = models.ForeignKey(User, on_delete=models.CASCADE)     # Fixed here
+    text = models.TextField(blank=True)
+    attachment = models.FileField(upload_to='chat_attachments/', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

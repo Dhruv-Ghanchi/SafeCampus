@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SafeCampus | Student Safety Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        #nav-menu { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .menu-open { overflow: hidden; }
+        /* Custom scrollbar for better UI */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen flex flex-col pb-20 md:pb-0">
+
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:inline-block absolute left-4 top-4 bg-indigo-600 text-white px-3 py-2 rounded-md z-[200]">Skip to content</a>
+
+    <nav class="glass border-b border-slate-100 py-4 px-6 md:px-12 sticky top-0 z-[90]">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="/home/" class="text-2xl font-black text-slate-900 tracking-tighter">
+                Safe<span class="text-indigo-600">Campus</span>
+            </a>
+            
+            <div class="hidden md:flex items-center gap-8">
+                
+                    
+                        <a href="/student/dashboard/" class="text-sm font-bold text-slate-600 hover:text-indigo-600 transition">Dashboard</a>
+                    
+
+                    <a href="/report/" class="text-sm font-bold text-slate-600 hover:text-rose-600 transition">File Report</a>
+
+                    <div class="h-4 w-[1px] bg-slate-200"></div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Hi, manual_student</span>
+                        <a href="/logout/" class="bg-slate-900 text-white px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-rose-600 transition shadow-lg shadow-slate-200">Logout</a>
+                    </div>
+                
+            </div>
+
+            <button onclick="toggleMenu()" class="md:hidden p-2 bg-slate-100 rounded-xl">
+                <svg id="menu-icon" class="w-6 h-6 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+
+        <div id="nav-menu" class="hidden fixed inset-0 top-[73px] bg-white z-[85] p-8 flex-col gap-6 md:hidden">
+            
+                <p class="text-xs font-black text-slate-400 uppercase tracking-widest">Navigation</p>
+                <a href="/home/" class="text-3xl font-black text-slate-900">Dashboard</a>
+                <a href="/report/" class="text-3xl font-black text-slate-900">New Report</a>
+                <div class="mt-auto">
+                    <a href="/logout/" class="block w-full text-center py-5 bg-rose-50 text-rose-600 rounded-2xl font-black text-lg">Logout</a>
+                </div>
+            
+        </div>
+    </nav>
+
+    <main class="flex-grow w-full max-w-7xl mx-auto py-6">
+        
+        
+<div class="max-w-2xl mx-auto py-6 md:py-12 px-4">
+    <div class="bg-white rounded-[3rem] shadow-2xl shadow-slate-200 border border-slate-100 overflow-hidden">
+        
+        <div class="bg-slate-900 p-8 md:p-12 text-white relative">
+            <div class="relative z-10">
+                <span class="bg-rose-500 text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full">Secure Portal</span>
+                <h2 class="text-3xl md:text-4xl font-black mt-4 tracking-tighter">Report Incident</h2>
+                <p class="text-slate-400 text-sm mt-2 font-medium">Your report is encrypted and handled with care.</p>
+            </div>
+
+            <div class="absolute top-8 right-8 z-20">
+                <button id="sos-btn" type="button" class="bg-rose-600 hover:bg-rose-700 text-white w-16 h-16 rounded-full flex items-center justify-center shadow-lg shadow-rose-900/40 transition-all hover:scale-110 active:scale-95 group">
+                    <span class="text-2xl group-hover:animate-pulse">🎙️</span>
+                </button>
+                <p class="text-[8px] text-center mt-2 font-black uppercase tracking-tighter text-rose-400">SOS LOG</p>
+            </div>
+            <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-600/20 blur-3xl rounded-full"></div>
+        </div>
+        
+        <div id="recording-status" class="hidden bg-rose-50 border-y border-rose-100 p-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <span class="relative flex h-3 w-3">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-rose-500"></span>
+                </span>
+                <span class="text-xs font-black text-rose-600 uppercase tracking-widest">Recording Audio...</span>
+            </div>
+            <button id="stop-sos" type="button" class="text-[10px] font-bold bg-rose-600 text-white px-4 py-1.5 rounded-full uppercase">Stop & Send</button>
+        </div>
+
+        <div class="flex border-b border-slate-50">
+            <div class="flex-1 py-4 text-center border-b-2 border-indigo-600">
+                <span class="text-[10px] font-black text-indigo-600 uppercase tracking-widest">1. Details</span>
+            </div>
+            <div class="flex-1 py-4 text-center">
+                <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest">2. Review</span>
+            </div>
+        </div>
+        
+        <form method="post" enctype="multipart/form-data" class="p-8 md:p-12 space-y-8">
+            <input type="hidden" name="csrfmiddlewaretoken" value="1rvSD4GL7pzJ4xfbFpYKcuYOOYMo7yibwDBKbHEGOFSDHjxGQP9DlZuMy82etFOO">
+            
+            <div class="space-y-6">
+                
+                <div class="group">
+                    <label class="block text-[10px] font-black uppercase text-slate-400 tracking-[0.15em] mb-3 group-focus-within:text-indigo-600 transition-colors">
+                        Title
+                    </label>
+                    
+                    <div class="form-field-container">
+                        <input type="text" name="title" class="w-full p-3 border rounded-lg" placeholder="Brief title of incident" maxlength="200" required id="id_title">
+                    </div>
+
+                    
+                    
+                    
+                </div>
+                
+                <div class="group">
+                    <label class="block text-[10px] font-black uppercase text-slate-400 tracking-[0.15em] mb-3 group-focus-within:text-indigo-600 transition-colors">
+                        Description
+                    </label>
+                    
+                    <div class="form-field-container">
+                        <textarea name="description" cols="40" rows="3" class="w-full p-3 border rounded-lg" placeholder="Describe what happened..." required id="id_description">
+</textarea>
+                    </div>
+
+                    
+                    
+                    
+                </div>
+                
+                <div class="group">
+                    <label class="block text-[10px] font-black uppercase text-slate-400 tracking-[0.15em] mb-3 group-focus-within:text-indigo-600 transition-colors">
+                        Location
+                    </label>
+                    
+                    <div class="form-field-container">
+                        <input type="text" name="location" class="w-full p-3 border rounded-lg" placeholder="e.g. Library, Block C, Parking" maxlength="100" required id="id_location">
+                    </div>
+
+                    
+                    
+                    
+                </div>
+                
+                <div class="group">
+                    <label class="block text-[10px] font-black uppercase text-slate-400 tracking-[0.15em] mb-3 group-focus-within:text-indigo-600 transition-colors">
+                        Incident date
+                    </label>
+                    
+                    <div class="form-field-container">
+                        <input type="datetime-local" name="incident_date" class="w-full p-3 border rounded-lg" required id="id_incident_date">
+                    </div>
+
+                    
+                    
+                    
+                </div>
+                
+                <div class="group">
+                    <label class="block text-[10px] font-black uppercase text-slate-400 tracking-[0.15em] mb-3 group-focus-within:text-indigo-600 transition-colors">
+                        Evidence
+                    </label>
+                    
+                    <div class="form-field-container">
+                        <input type="file" name="evidence" class="w-full p-3 border rounded-lg" id="id_evidence">
+                    </div>
+
+                    
+                    
+                    
+                </div>
+                
+                <div class="group">
+                    <label class="block text-[10px] font-black uppercase text-slate-400 tracking-[0.15em] mb-3 group-focus-within:text-indigo-600 transition-colors">
+                        Voice recording
+                    </label>
+                    
+                    <div class="form-field-container">
+                        <input type="file" name="voice_recording" class="w-full p-3 border rounded-lg" id="id_voice_recording">
+                    </div>
+
+                    
+                    
+                    
+                </div>
+                
+                <div class="group">
+                    <label class="block text-[10px] font-black uppercase text-slate-400 tracking-[0.15em] mb-3 group-focus-within:text-indigo-600 transition-colors">
+                        Is anonymous
+                    </label>
+                    
+                    <div class="form-field-container">
+                        <input type="checkbox" name="is_anonymous" id="id_is_anonymous">
+                    </div>
+
+                    
+                    
+                    
+                </div>
+                
+            </div>
+
+            <div class="pt-6">
+                <button type="submit" class="group w-full bg-indigo-600 text-white py-5 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-indigo-100 hover:bg-slate-900 active:scale-[0.98] transition-all duration-300 flex justify-center items-center gap-3">
+                    Submit Secure Report
+                    <span class="group-hover:translate-x-1 transition-transform">→</span>
+                </button>
+                
+                <div class="mt-8 p-4 bg-slate-50 rounded-2xl flex items-start gap-4">
+                    <span class="text-xl">🛡️</span>
+                    <p class="text-[10px] text-slate-500 leading-relaxed font-medium">
+                        <strong class="text-slate-900">Privacy Policy:</strong> By submitting, you understand this information will be used for campus safety. Anonymous reports protect your identity.
+                    </p>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* Styling Django-rendered inputs */
+    input[type="text"], input[type="email"], input[type="number"], 
+    textarea, select {
+        width: 100%; padding: 1rem 1.25rem; background-color: #f8fafc; border: 2px solid #f1f5f9;
+        border-radius: 1rem; font-size: 0.875rem; font-weight: 600; color: #1e293b; transition: all 0.3s ease;
+    }
+    input:focus, textarea:focus, select:focus {
+        outline: none; background-color: #ffffff; border-color: #6366f1;
+        box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.1);
+    }
+    input[type="file"] { padding: 0.75rem; background: white; border: 2px dashed #e2e8f0; cursor: pointer; }
+    input[type="checkbox"] { width: 1.25rem; height: 1.25rem; border-radius: 0.375rem; accent-color: #6366f1; }
+</style>
+
+<script>
+    let mediaRecorder;
+    let audioChunks = [];
+
+    const sosBtn = document.getElementById('sos-btn');
+    const stopBtn = document.getElementById('stop-sos');
+    const statusOverlay = document.getElementById('recording-status');
+
+    sosBtn.addEventListener('click', async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+
+            mediaRecorder.ondataavailable = (event) => { audioChunks.push(event.data); };
+
+            mediaRecorder.onstop = async () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                const formData = new FormData();
+                formData.append('audio_data', audioBlob);
+                formData.append('csrfmiddlewaretoken', '1rvSD4GL7pzJ4xfbFpYKcuYOOYMo7yibwDBKbHEGOFSDHjxGQP9DlZuMy82etFOO');
+
+                const response = await fetch("/handle-sos/", {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                if (result.status === 'success') {
+                    alert('SOS Voice Log Sent! Case Token: #' + result.case_token);
+                }
+            };
+
+            mediaRecorder.start();
+            statusOverlay.classList.remove('hidden');
+            sosBtn.classList.add('animate-pulse', 'ring-4', 'ring-rose-200');
+        } catch (err) {
+            alert('Microphone access denied.');
+        }
+    });
+
+    stopBtn.addEventListener('click', () => {
+        mediaRecorder.stop();
+        statusOverlay.classList.add('hidden');
+        sosBtn.classList.remove('animate-pulse', 'ring-4', 'ring-rose-200');
+    });
+</script>
+<script>
+    // Client-side upload validation for report form
+    const MAX_UPLOAD_SIZE = 5 * 1024 * 1024; // 5MB
+    const ALLOWED_UPLOAD_TYPES = ['image/jpeg','image/png','image/gif','application/pdf','audio/wav','audio/mpeg','audio/mp3'];
+
+    function attachValidation(inputName) {
+        const input = document.querySelector(`input[name="${inputName}"]`);
+        if (!input) return null;
+        input.setAttribute('accept', '.jpg,.jpeg,.png,.gif,.pdf,.wav,.mp3');
+        const err = document.createElement('div');
+        err.className = 'text-rose-500 text-xs mt-2 hidden';
+        input.parentNode.appendChild(err);
+        input.addEventListener('change', (e) => {
+            const f = e.target.files[0];
+            if (!f) { err.classList.add('hidden'); return; }
+            if (f.size > MAX_UPLOAD_SIZE) { err.innerText = 'File too large (max 5 MB).'; err.classList.remove('hidden'); }
+            else if (!ALLOWED_UPLOAD_TYPES.includes(f.type)) { err.innerText = 'Unsupported file type.'; err.classList.remove('hidden'); }
+            else { err.classList.add('hidden'); }
+        });
+        return err;
+    }
+
+    const evidenceErr = attachValidation('evidence');
+    const voiceErr = attachValidation('voice_recording');
+
+    const reportForm = document.querySelector('form[enctype="multipart/form-data"]');
+    if (reportForm) {
+        reportForm.addEventListener('submit', (e) => {
+            const ev = document.querySelector('input[name="evidence"]')?.files?.[0] || null;
+            const vo = document.querySelector('input[name="voice_recording"]')?.files?.[0] || null;
+            const bad = (f) => f && (f.size > MAX_UPLOAD_SIZE || !ALLOWED_UPLOAD_TYPES.includes(f.type));
+            if (bad(ev) || bad(vo)) {
+                e.preventDefault();
+                if (ev && evidenceErr) evidenceErr.classList.remove('hidden');
+                if (vo && voiceErr) voiceErr.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+    }
+</script>
+
+    </main>
+
+    
+    <div class="md:hidden fixed bottom-6 left-6 right-6 z-[100]">
+        <nav class="bg-slate-900/95 backdrop-blur-xl rounded-[2.5rem] border border-white/10 shadow-2xl h-16 flex items-center justify-around px-2">
+            <a href="/home/" class="flex flex-col items-center justify-center w-12 h-12 rounded-full text-white/50 hover:text-white transition">
+                <i class="fas fa-chart-pie text-lg"></i>
+                <span class="text-[8px] font-black uppercase mt-0.5">Stats</span>
+            </a>
+            
+            <a href="/report/" class="flex items-center justify-center w-14 h-14 bg-indigo-600 rounded-full border-4 border-slate-50 -mt-10 shadow-xl shadow-indigo-500/40 active:scale-90 transition-transform">
+                <i class="fas fa-plus text-white text-xl"></i>
+            </a>
+
+            <a href="#" class="flex flex-col items-center justify-center w-12 h-12 rounded-full text-white/50 hover:text-white transition">
+                <i class="fas fa-comment-dots text-lg"></i>
+                <span class="text-[8px] font-black uppercase mt-0.5">Chat</span>
+            </a>
+        </nav>
+    </div>
+    
+
+    
+    <div class="fixed top-24 right-4 z-[80] md:bottom-10 md:right-10 md:top-auto">
+        <button id="sosBtn" class="w-14 h-14 md:w-24 md:h-24 bg-rose-600 text-white rounded-full shadow-[0_0_30px_rgba(225,29,72,0.4)] flex flex-col items-center justify-center border-2 md:border-4 border-white animate-pulse active:scale-95 transition-all">
+            <span class="text-[8px] md:text-[10px] font-black uppercase">Help</span>
+            <span class="text-base md:text-2xl font-black italic">SOS</span>
+        </button>
+    </div>
+
+    <div id="sosModal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-xl z-[110] hidden flex items-center justify-center p-6">
+        <div class="bg-white w-full max-w-sm rounded-[3rem] p-8 text-center shadow-2xl border border-white/20">
+            <div id="callUI">
+                <div class="w-24 h-24 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-6 relative">
+                    <div class="absolute inset-0 rounded-full bg-rose-400 animate-ping opacity-20"></div>
+                    <span class="text-4xl">📞</span>
+                </div>
+                <h2 class="text-2xl font-black text-slate-900 tracking-tight">Contacting Staff</h2>
+                <p class="text-slate-500 mb-8 font-medium">Hold on, we're alerting security.</p>
+                <button onclick="closeSOS()" class="w-full py-4 bg-slate-100 text-slate-600 rounded-2xl font-black active:scale-95 transition">Cancel</button>
+            </div>
+
+            <div id="recordUI" class="hidden">
+                <div class="w-24 h-24 bg-rose-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl shadow-rose-200">
+                    <span class="text-white text-3xl animate-pulse">🎙️</span>
+                </div>
+                <h2 class="text-xl font-black text-rose-600 uppercase tracking-widest">Recording...</h2>
+                <div id="timer" class="text-4xl font-mono font-black my-6 text-slate-900">00:00</div>
+                <button id="stopRecord" class="w-full py-5 bg-rose-600 text-white rounded-2xl font-black shadow-lg shadow-rose-200 active:scale-95 transition">End & Send Report</button>
+            </div>
+        </div>
+    </div>
+    
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('nav-menu');
+            const body = document.body;
+            menu.classList.toggle('hidden');
+            menu.classList.toggle('flex');
+            body.classList.toggle('menu-open');
+        }
+
+        // SOS Script Logic
+        const sosBtn = document.getElementById('sosBtn');
+        const modal = document.getElementById('sosModal');
+        const callUI = document.getElementById('callUI');
+        const recordUI = document.getElementById('recordUI');
+        let mediaRecorder;
+        let audioChunks = [];
+
+        if(sosBtn) {
+            sosBtn.onclick = () => {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    if(!modal.classList.contains('hidden')) startVoicemail();
+                }, 4000);
+            };
+        }
+
+        function closeSOS() { modal.classList.add('hidden'); }
+
+        async function startVoicemail() {
+            callUI.classList.add('hidden');
+            recordUI.classList.remove('hidden');
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.start();
+                
+                let sec = 0;
+                setInterval(() => {
+                    sec++;
+                    let m = Math.floor(sec/60);
+                    let s = sec%60;
+                    document.getElementById('timer').innerText = `${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
+                }, 1000);
+
+                mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
+                mediaRecorder.onstop = async () => {
+                    const blob = new Blob(audioChunks, { type: 'audio/wav' });
+                    const formData = new FormData();
+                    formData.append('audio_data', blob);
+                    formData.append('csrfmiddlewaretoken', '1rvSD4GL7pzJ4xfbFpYKcuYOOYMo7yibwDBKbHEGOFSDHjxGQP9DlZuMy82etFOO');
+                    const response = await fetch('/handle-sos/', { method: 'POST', body: formData });
+                    if (response.ok) {
+                        modal.innerHTML = "<div class='p-12 text-center'><h2 class='text-3xl font-black text-emerald-600 mb-2'>Sent.</h2><p class='text-slate-500 font-bold'>Authorities have been notified.</p></div>";
+                        setTimeout(() => location.reload(), 2000);
+                    }
+                };
+            } catch (err) {
+                alert("Microphone required for SOS.");
+                closeSOS();
+            }
+        }
+
+        const stopBtn = document.getElementById('stopRecord');
+        if(stopBtn) stopBtn.onclick = () => { if(mediaRecorder) mediaRecorder.stop(); };
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,224 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8 h-[calc(100vh-120px)] flex flex-col">
+    
+    <div class="bg-slate-900 rounded-t-[2.5rem] p-6 text-white flex justify-between items-center shadow-2xl">
+        <div class="flex items-center gap-4">
+            <a href="{% url 'student_dashboard' %}" class="bg-slate-800 p-3 rounded-xl hover:bg-indigo-600 transition">
+                ←
+            </a>
+            <div>
+                <h2 class="font-black text-lg leading-tight">{{ incident.title|truncatechars:30 }}</h2>
+                <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">
+                        Token: #{{ incident.case_token }}
+                    </span>
+                    {% if incident.status == 'Resolved' %}
+                    <span class="bg-emerald-500 text-[8px] font-black uppercase px-2 py-0.5 rounded text-white tracking-tighter">Resolved</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-3">
+            {% if incident.status == 'Resolved' %}
+                <a href="{% url 'export_incident_pdf' incident.id %}" class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition flex items-center gap-2">
+                    📄 Audit PDF
+                </a>
+            {% endif %}
+
+            {% if incident.is_anonymous and not incident.is_identity_revealed %}
+            <div class="hidden md:flex items-center gap-2 bg-rose-500/20 border border-rose-500/50 px-4 py-2 rounded-full">
+                <span class="animate-pulse text-rose-500">🛡️</span>
+                <span class="text-[10px] font-black uppercase tracking-tighter text-rose-200">Identity Shield Active</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="flex-1 bg-white border-x border-slate-100 overflow-y-auto p-6 space-y-6 no-scrollbar" id="chat-window" role="log" aria-live="polite" aria-label="Conversation messages">
+        <div class="flex justify-center">
+            <span class="bg-slate-50 text-slate-400 text-[10px] font-black uppercase px-4 py-1 rounded-full">
+                Secure Tunnel Established: {{ incident.reported_at|date:"M d, H:i" }}
+            </span>
+        </div>
+
+        {% for message in messages %}
+            <div class="flex {% if message.sender == request.user %}justify-end{% else %}justify-start{% endif %}">
+                <div class="max-w-[80%] {% if message.sender == request.user %}bg-indigo-600 text-white rounded-[2rem] rounded-tr-none{% else %}bg-slate-100 text-slate-900 rounded-[2rem] rounded-tl-none{% endif %} p-5 shadow-sm">
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="text-[11px] font-bold">{% if message.sender == request.user %}You{% else %}{{ message.sender.username }}{% endif %}</span>
+                        {% if message.sender.role %}
+                            <span class="text-[9px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 font-black">{{ message.sender.role|title }}</span>
+                        {% endif %}
+                    </div>
+                    {% if message.text %}
+                        <p class="text-sm font-medium leading-relaxed">{{ message.text }}</p>
+                    {% endif %}
+
+                    {% if message.attachment %}
+                        <div class="mt-3">
+                            {% if message.attachment.name|lower|slice:"-4:" == ".jpg" or message.attachment.name|lower|slice:"-4:" == ".png" or message.attachment.name|lower|slice:"-5:" == ".jpeg" or message.attachment.name|lower|slice:"-4:" == ".gif" %}
+                                <a href="{{ message.attachment.url }}" target="_blank">
+                                    <img src="{{ message.attachment.url }}" class="rounded-xl max-w-full h-auto border border-black/10 shadow-md hover:opacity-90 transition">
+                                </a>
+                            {% else %}
+                                <a href="{{ message.attachment.url }}" target="_blank" class="flex items-center gap-2 bg-black/5 p-3 rounded-xl text-[10px] font-black uppercase tracking-tighter hover:bg-black/10 transition">
+                                    📎 View Attached Document
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                    <span class="text-[9px] font-bold opacity-60 mt-2 block uppercase tracking-widest">
+                        {{ message.created_at|date:"M d, H:i" }}
+                    </span>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="bg-white border-t border-slate-100 p-6 rounded-b-[2.5rem] shadow-2xl">
+        {% if incident.status == 'Resolved' %}
+            <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 text-center">
+                <p class="text-emerald-700 text-xs font-black uppercase tracking-widest mb-2">✅ This Case is Resolved</p>
+                <p class="text-slate-500 text-[10px] font-medium leading-relaxed">
+                    The administration has marked this incident as complete. Communication is now closed. 
+                    You can download the full transcript as a PDF from the header above.
+                </p>
+            </div>
+        {% elif incident.is_anonymous and not incident.is_identity_revealed %}
+            <div class="text-center py-4">
+                <p class="text-slate-500 text-xs font-bold mb-4">You must reveal your identity to send messages to the campus authorities.</p>
+                <a href="{% url 'reveal_identity' incident.id %}" class="bg-slate-900 text-white px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 transition">
+                    Reveal Identity & Start Chat
+                </a>
+            </div>
+        {% else %}
+            <form method="POST" enctype="multipart/form-data" class="flex gap-3 items-center sticky-action-target">
+                {% csrf_token %}
+                
+                <label class="cursor-pointer bg-slate-100 p-4 rounded-2xl hover:bg-slate-200 transition active:scale-95 flex items-center justify-center" role="button" tabindex="0" aria-label="Attach file">
+                    <input type="file" name="attachment" class="hidden" id="file-input" aria-describedby="file-input-help">
+                    <span class="text-lg" title="Attach file">📎</span>
+                </label>
+                <div id="file-input-help" class="sr-only">Accepted: jpg, png, gif, pdf, wav, mp3. Max 5 MB.</div>
+
+                <input type="text" name="message" id="message-text" aria-label="Type your message" placeholder="Type your message here..." 
+                       class="flex-1 bg-slate-50 border-none rounded-2xl px-6 py-4 text-sm font-bold focus:ring-2 focus:ring-indigo-600 transition">
+                
+                <button type="submit" id="send-button" class="btn-primary text-xs uppercase tracking-widest active:scale-90" disabled aria-disabled="true" aria-label="Send message">
+                    Send
+                </button>
+            </form>
+            <div id="file-name-preview" class="hidden mt-2 ml-14 text-[10px] font-bold text-indigo-600 uppercase flex items-center gap-3">
+                <span id="file-name-text"></span>
+                <button id="file-remove-btn" class="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-lg hidden">Remove</button>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    // Auto-scroll to bottom
+    const chatWindow = document.getElementById('chat-window');
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+
+    // Client-side validation constants (mirror server limits)
+    const MAX_UPLOAD_SIZE = 5 * 1024 * 1024; // 5MB
+    const ALLOWED_UPLOAD_TYPES = ['image/jpeg','image/png','image/gif','application/pdf','audio/wav','audio/mpeg','audio/mp3'];
+
+    // Filename preview logic
+    const fileInput = document.getElementById('file-input');
+    const namePreview = document.getElementById('file-name-preview');
+
+    const messageInput = document.getElementById('message-text');
+    const sendButton = document.querySelector('button[type="submit"]');
+    // disable send by default
+    if (sendButton) sendButton.disabled = true;
+    function updateSendAria() { if (sendButton) sendButton.setAttribute('aria-disabled', sendButton.disabled ? 'true' : 'false'); }
+    updateSendAria();
+
+    if (fileInput) {
+        fileInput.setAttribute('accept', '.jpg,.jpeg,.png,.gif,.pdf,.wav,.mp3');
+        fileInput.onchange = function() {
+            const namePreview = document.getElementById('file-name-preview');
+            if (this.files.length > 0) {
+                const f = this.files[0];
+                // validate
+                if (f.size > MAX_UPLOAD_SIZE) {
+                    namePreview.innerText = 'File too large (max 5 MB).';
+                    namePreview.classList.remove('hidden');
+                    if (sendButton) sendButton.disabled = true;
+                    updateSendAria();
+                    return;
+                }
+                if (!ALLOWED_UPLOAD_TYPES.includes(f.type)) {
+                    namePreview.innerText = 'Unsupported file type.';
+                    namePreview.classList.remove('hidden');
+                    if (sendButton) sendButton.disabled = true;
+                    updateSendAria();
+                    return;
+                }
+                const txt = "Selected: " + f.name + ' (' + Math.round(f.size/1024) + ' KB)';
+                const nameText = document.getElementById('file-name-text');
+                if (nameText) nameText.innerText = txt;
+                namePreview.classList.remove('hidden');
+                const removeBtn = document.getElementById('file-remove-btn');
+                if (removeBtn) removeBtn.classList.remove('hidden');
+                if (sendButton) sendButton.disabled = false;
+                updateSendAria();
+                return;
+            }
+            // no files
+            if (sendButton) sendButton.disabled = (messageInput.value.trim() === '');
+            updateSendAria();
+        };
+    }
+
+    // Remove file handler
+    const fileRemoveBtn = document.getElementById('file-remove-btn');
+    if (fileRemoveBtn) {
+        fileRemoveBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (fileInput) fileInput.value = '';
+            const preview = document.getElementById('file-name-preview');
+            if (preview) preview.classList.add('hidden');
+            if (sendButton) sendButton.disabled = (messageInput.value.trim() === '');
+            updateSendAria();
+        });
+    }
+
+    // Enter-to-send and disable empty send
+    if (messageInput) {
+        messageInput.addEventListener('keyup', (e) => {
+            const val = messageInput.value.trim();
+            if (sendButton) sendButton.disabled = (val === '' && (!fileInput || fileInput.files.length === 0));
+            updateSendAria();
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if (val !== '' || (fileInput && fileInput.files.length > 0)) sendButton.click();
+            }
+        });
+    }
+
+    // Prevent submit if invalid file
+    const chatForm = document.querySelector('form[enctype="multipart/form-data"]');
+    if (chatForm) {
+        chatForm.addEventListener('submit', (e) => {
+            if (fileInput && fileInput.files.length > 0) {
+                const f = fileInput.files[0];
+                if (f.size > MAX_UPLOAD_SIZE || !ALLOWED_UPLOAD_TYPES.includes(f.type)) {
+                    e.preventDefault();
+                    namePreview.classList.remove('hidden');
+                }
+            }
+        });
+    }
+</script>
+
+<style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
+{% endblock %}

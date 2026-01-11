@@ -1,110 +1,274 @@
 {% extends 'core/base.html' %}
 {% block content %}
-<div class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 py-6">
+<div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 py-4 md:py-10 px-4">
     
-    <div class="lg:col-span-1 space-y-6">
-        <div class="bg-white rounded-xl shadow-sm border p-6">
-            <a href="{% url 'counsellor_dashboard' %}" class="text-xs text-indigo-600 font-bold uppercase hover:underline">← All Cases</a>
+    <div class="lg:col-span-4 space-y-6">
+        <div id="case-sidebar" role="region" aria-labelledby="incident-title" class="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 p-8 sticky top-24">
+            <a href="{% url 'counsellor_dashboard' %}" class="inline-flex items-center text-[10px] text-slate-400 font-black uppercase mb-6">
+                <span class="mr-2">←</span> Back to Command Center
+            </a>
             
-            <div class="mt-4">
-                <span class="text-[10px] font-mono bg-gray-100 px-2 py-1 rounded text-gray-500">#{{ incident.case_token }}</span>
-                <h2 class="text-xl font-bold mt-2">{{ incident.title }}</h2>
-                <p class="text-xs text-gray-400 mt-1">Location: {{ incident.location }}</p>
+            <div class="mb-8">
+                <h2 id="incident-title" class="text-3xl font-black text-slate-900 tracking-tighter">{{ incident.title }}</h2>
+                <span class="font-mono text-[10px] bg-slate-900 text-white px-3 py-1 rounded-lg">#{{ incident.case_token|default:incident.id }}</span>
             </div>
 
-            {% if incident.evidence %}
-            <div class="mt-6 p-4 bg-gray-50 rounded-lg border border-dashed">
-                <p class="text-[10px] text-gray-400 uppercase font-bold mb-2">Attached Evidence</p>
-                <a href="{{ incident.evidence.url }}" target="_blank" class="text-xs text-indigo-600 font-bold flex items-center gap-2 hover:underline">
-                    <span>📎</span> View Uploaded File
-                </a>
-            </div>
-            {% endif %}
-
-            <div class="mt-6 space-y-4">
-                <div>
-                    <p class="text-[10px] text-gray-400 uppercase font-bold">Sentiment Score</p>
-                    <div class="flex items-center gap-2 mt-1">
-                        <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-                            <div class="h-full {% if incident.sentiment_score < 0 %}bg-red-500{% else %}bg-green-500{% endif %}" 
-                                 style="width: 100%"></div>
-                        </div>
-                        <span class="text-xs font-bold">{{ incident.sentiment_score|floatformat:2 }}</span>
+            <div id="incident-details" class="mb-6 text-sm text-slate-700">
+                <h4 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Report Details</h4>
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 mb-3">
+                    <p class="text-sm leading-relaxed whitespace-pre-wrap">{{ incident.description }}</p>
+                    <div class="mt-3 text-[11px] text-slate-500">
+                        <div><strong>Location:</strong> {{ incident.location }}</div>
+                        <div><strong>Incident date:</strong> {{ incident.incident_date|date:"M d, Y H:i" }}</div>
+                        <div><strong>Reported:</strong> {{ incident.reported_at|date:"M d, Y H:i" }}</div>
+                        <div><strong>Reporter:</strong> {% if incident.is_anonymous and not incident.is_identity_revealed %}Anonymous{% else %}{{ incident.reporter.username }}{% endif %}</div>
                     </div>
                 </div>
 
-                <div>
-                    <p class="text-[10px] text-gray-400 uppercase font-bold">Reporter Identity</p>
-                    <p class="text-sm font-medium">
-                        {% if incident.is_anonymous and not incident.is_identity_revealed %}
-                            <span class="text-rose-500 italic">Anonymous (Hidden)</span>
-                        {% else %}
-                            <span class="text-indigo-600">{{ incident.reporter.username }}</span>
-                        {% endif %}
-                    </p>
+                <h4 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Evidence & Files</h4>
+                <div class="space-y-3">
+                    {% if incident.evidence %}
+                        <div class="bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
+                            {% if incident.evidence.name|lower|slice:"-4:" == ".jpg" or incident.evidence.name|lower|slice:"-4:" == ".png" or incident.evidence.name|lower|slice:"-5:" == ".jpeg" or incident.evidence.name|lower|slice:"-4:" == ".gif" %}
+                                <a href="{{ incident.evidence.url }}" target="_blank"><img src="{{ incident.evidence.url }}" class="max-w-full rounded-lg border" alt="Evidence image"></a>
+                            {% else %}
+                                <a href="{{ incident.evidence.url }}" class="text-[12px] font-black text-indigo-600 underline" target="_blank">📎 Download reported evidence</a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                    {% if incident.voice_recording %}
+                        <div class="bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
+                            <div class="text-[12px] font-black text-slate-700 mb-2">🔊 Voice recording (submission)</div>
+                            <audio controls preload="none" class="w-full">
+                                <source src="{{ incident.voice_recording.url }}">
+                                Your browser does not support the audio element.
+                            </audio>
+                        </div>
+                    {% endif %}
+
+                    {# Gather attachments uploaded in chat/messages #}
+                    {% with attachments=messages|dictsort:"created_at" %}
+                        {% for msg in messages %}
+                            {% if msg.attachment %}
+                                <div class="bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-3">
+                                            <div class="text-[11px] font-black text-slate-600">{{ msg.attachment.name|slice:"-40:" }}</div>
+                                            <div class="text-[10px] text-slate-400">by {% if msg.sender == user %}You{% else %}{{ msg.sender.username }}{% endif %} • {{ msg.created_at|date:"M d, H:i" }}</div>
+                                        </div>
+                                        <div>
+                                            <a href="{{ msg.attachment.url }}" target="_blank" class="text-indigo-600 font-bold text-xs">Open</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endwith %}
                 </div>
             </div>
 
-            <form method="post" class="mt-8 pt-6 border-t space-y-4">
+            <form method="post" id="status-update-form" role="form" aria-label="Update case status" class="pt-6 border-t border-slate-100 space-y-5">
                 {% csrf_token %}
                 <div>
-                    <label class="text-[10px] text-gray-400 uppercase font-bold">Internal Staff Notes</label>
-                    <textarea name="internal_notes" rows="3" class="w-full mt-2 p-2 border rounded-lg text-xs bg-yellow-50" placeholder="Private notes...">{{ incident.internal_notes|default:'' }}</textarea>
+                    <label class="text-[10px] text-slate-400 uppercase font-black block mb-2">Internal Staff Log</label>
+                    <textarea name="internal_notes" rows="3" class="w-full p-4 border border-slate-200 rounded-2xl text-xs bg-slate-50">{{ incident.internal_notes|default:'' }}</textarea>
                 </div>
 
                 <div>
-                    <label class="text-[10px] text-gray-400 uppercase font-bold">Change Case Status</label>
-                    <select name="status" class="w-full mt-2 p-2 border rounded-lg text-sm bg-gray-50">
-                        {% for val, label in incident.STATUS_CHOICES %}
-                            <option value="{{ val }}" {% if incident.status == val %}selected{% endif %}>{{ label }}</option>
-                        {% endfor %}
+                    <label class="text-[10px] text-slate-400 uppercase font-black block mb-2">Set Case Status</label>
+                    <select name="status" id="status-select" aria-label="Set case status" class="w-full p-3 border border-slate-200 rounded-xl text-xs font-bold bg-slate-50">
+                        <option value="Reported" {% if incident.status == 'Reported' %}selected{% endif %}>Reported</option>
+                        <option value="Under Review" {% if incident.status == 'Under Review' %}selected{% endif %}>Under Review</option>
+                        <option value="Action Taken" {% if incident.status == 'Action Taken' %}selected{% endif %}>Action Taken</option>
+                        <option value="Resolved" {% if incident.status == 'Resolved' %}selected{% endif %}>Resolved</option>
                     </select>
                 </div>
 
-                <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-lg text-sm font-bold hover:bg-indigo-700">
-                    Update Case Data
+                <button type="submit" class="w-full btn-primary text-xs uppercase tracking-widest">
+                    Update Case Status
                 </button>
             </form>
         </div>
     </div>
 
-    <div class="lg:col-span-2">
-        <div class="bg-white rounded-xl shadow-sm border overflow-hidden flex flex-col h-[650px]">
-            <div class="p-4 bg-gray-800 text-white font-bold flex justify-between items-center">
-                <span>Case Discussion</span>
-                <span class="text-[10px] opacity-70">ACTIVE SESSION</span>
+    <div class="lg:col-span-8">
+        <div class="bg-white rounded-[3rem] shadow-2xl border border-slate-100 overflow-hidden flex flex-col h-[750px]" role="region" aria-label="Incident discussion panel">
+            <div class="px-8 py-6 bg-slate-900 text-white">
+                <h3 class="font-black text-sm uppercase tracking-widest">Incident Discussion</h3>
             </div>
 
-            <div class="flex-1 p-6 overflow-y-auto space-y-4 bg-gray-50">
-                <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-lg mb-6">
-                    <p class="text-xs text-indigo-800 font-medium">Original Description:</p>
-                    <p class="text-sm text-indigo-900 mt-1">"{{ incident.description }}"</p>
-                </div>
-
-                {% for msg in incident.messages.all %}
+            <div id="chat-window" class="flex-1 p-6 overflow-y-auto space-y-6 bg-slate-50/50 no-scrollbar" role="log" aria-live="polite" aria-atomic="false" aria-label="Incident messages">
+                {% if not messages %}
+                    <div class="text-center text-slate-400 font-bold uppercase">No messages yet — start the conversation</div>
+                {% endif %}
+                {% for msg in messages %}
                     <div class="flex {% if msg.sender == user %}justify-end{% else %}justify-start{% endif %}">
-                        <div class="max-w-md p-3 rounded-2xl shadow-sm text-sm 
-                            {% if msg.sender == user %}bg-indigo-600 text-white rounded-tr-none{% else %}bg-white border text-gray-800 rounded-tl-none{% endif %}">
-                            <p class="font-bold text-[10px] uppercase opacity-75 mb-1">{{ msg.sender.username }}</p>
-                            {{ msg.text }}
-                            <p class="text-[9px] mt-1 opacity-60 text-right">{{ msg.created_at|date:"P" }}</p>
+                        <div class="max-w-[80%] flex flex-col {% if msg.sender == user %}items-end{% endif %}">
+                            <div class="p-4 rounded-3xl text-sm shadow-sm {% if msg.sender == user %}bg-slate-900 text-white rounded-tr-none{% else %}bg-white border border-slate-100 text-slate-800 rounded-tl-none{% endif %}">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <span class="text-[11px] font-bold">{% if msg.sender == user %}You{% else %}{{ msg.sender.username }}{% endif %}</span>
+                                    {% if msg.sender.role %}
+                                        <span class="text-[9px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 font-black">{{ msg.sender.role|title }}</span>
+                                    {% endif %}
+                                </div>
+                                <p class="font-medium leading-relaxed">{{ msg.text }}</p>
+                                {% if msg.attachment %}
+                                    <div class="mt-2 pt-2 border-t border-white/10">
+                                        <a href="{{ msg.attachment.url }}" target="_blank" class="text-[10px] font-black underline uppercase">📎 View File</a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <span class="text-[9px] mt-2 font-bold text-slate-400">{{ msg.created_at|date:"M d, H:i" }}</span>
                         </div>
                     </div>
-                {% empty %}
-                    <div class="text-center py-10 text-gray-400 text-sm">No messages yet.</div>
                 {% endfor %}
             </div>
 
-            {% if incident.is_anonymous and not incident.is_identity_revealed %}
-            <div class="p-4 bg-gray-100 text-center border-t italic text-gray-500 text-sm">Chat disabled for anonymous cases.</div>
-            {% else %}
-            <form method="post" class="p-4 border-t bg-white flex gap-2">
-                {% csrf_token %}
-                <input type="text" name="message" placeholder="Type your response..." class="flex-1 p-3 border rounded-xl bg-gray-50" required>
-                <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-xl font-bold">Reply</button>
-            </form>
-            {% endif %}
+            <div class="p-6 bg-white border-t border-slate-100">
+                {% if incident.is_anonymous and not incident.is_identity_revealed %}
+                        <label for="internal-notes" class="text-[10px] text-slate-400 uppercase font-black block mb-2">Internal Staff Log</label>
+                        <textarea id="internal-notes" name="internal_notes" rows="3" class="w-full p-4 border border-slate-200 rounded-2xl text-xs bg-slate-50" aria-label="Internal staff notes">{{ incident.internal_notes|default:'' }}</textarea>
+                    </div>
+                    {# Staff should still be able to message; only the anonymous reporter is blocked until they reveal identity #}
+                    {% if user.role == 'counsellor' or user.role == 'security' or user.is_superuser %}
+                        <label for="status-select" class="text-[10px] text-slate-400 uppercase font-black block mb-2">Set Case Status</label>
+                        <select name="status" id="status-select" class="w-full p-3 border border-slate-200 rounded-xl text-xs font-bold bg-slate-50" aria-label="Set case status">
+
+                            <div class="bg-slate-50 p-4 rounded-2xl border-2 border-dashed border-slate-200">
+                                <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Upload Evidence:</label>
+                            <option value="Resolved" {% if incident.status == 'Resolved' %}selected{% endif %}>Resolved</option>
+                                <div id="chat-attachment-error" class="text-rose-500 text-xs mt-2 hidden" role="status" aria-live="polite"></div>
+                                <div id="file-name-preview" class="hidden mt-2 text-[10px] font-bold text-indigo-600 flex items-center gap-3">
+                                    <span id="file-name-text"></span>
+                                    <button id="file-remove-btn" class="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-lg hidden" aria-label="Remove attached file">Remove</button>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-4">
+                                <input id="chat-message" type="text" name="message" autocomplete="off" placeholder="Type response..." aria-label="Type your response" class="flex-1 px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                                <button id="chat-send" type="submit" class="btn-primary text-xs uppercase tracking-widest" disabled aria-disabled="true" aria-label="Send message">
+                                    Send
+                                </button>
+                            </div>
+                        </form>
+                    {% else %}
+                        <div class="text-[12px] text-slate-500">The reporter's identity is shielded. They must reveal identity to participate in chat.</div>
+                    {% endif %}
+                {% else %}
+                    <form id="chat-form" method="post" enctype="multipart/form-data" class="space-y-4 sticky-action-target">
+                        {% csrf_token %}
+
+                        <div class="bg-slate-50 p-4 rounded-2xl border-2 border-dashed border-slate-200">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Upload Evidence:</label>
+                            <input type="file" id="chat-attachment" name="attachment" class="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                            <div id="chat-attachment-error" class="text-rose-500 text-xs mt-2 hidden"></div>
+                            <div id="file-name-preview" class="hidden mt-2 text-[10px] font-bold text-indigo-600 flex items-center gap-3">
+                                <span id="file-name-text"></span>
+                                <button id="file-remove-btn" class="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-lg hidden">Remove</button>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4">
+                            <input id="chat-message" type="text" name="message" autocomplete="off" placeholder="Type response..." class="flex-1 px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                            <button id="chat-send" type="submit" class="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase hover:bg-slate-900 transition-all" disabled aria-disabled="true">
+                                Send
+                            </button>
+                        </div>
+                    </form>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
+
+<div id="resolve-modal" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-sm z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="resolve-title">
+    <div class="bg-white rounded-[3rem] max-w-md w-full p-10 text-center shadow-2xl">
+        <h3 id="resolve-title" class="text-2xl font-black text-slate-900 mb-2">Resolve Case?</h3>
+        <div class="flex flex-col gap-3 mt-8">
+            <button id="confirm-resolve" class="w-full bg-emerald-600 text-white py-4 rounded-2xl text-xs font-black uppercase tracking-widest">Confirm & Resolve</button>
+            <button id="cancel-resolve" class="w-full bg-slate-100 text-slate-400 py-4 rounded-2xl text-xs font-black uppercase tracking-widest" aria-label="Cancel resolution">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const statusSelect = document.getElementById('status-select');
+    const statusForm = document.getElementById('status-update-form');
+    const resolveModal = document.getElementById('resolve-modal');
+    const confirmResolveBtn = document.getElementById('confirm-resolve');
+    const cancelResolveBtn = document.getElementById('cancel-resolve');
+    let originalStatus = statusSelect ? statusSelect.value : '';
+
+    if (statusForm) {
+        statusForm.onsubmit = function(e) {
+            if (statusSelect && statusSelect.value === 'Resolved' && originalStatus !== 'Resolved') {
+                e.preventDefault();
+                resolveModal.classList.remove('hidden');
+                // move focus into modal for accessibility
+                confirmResolveBtn && confirmResolveBtn.focus();
+            }
+        };
+    }
+
+    if (confirmResolveBtn) confirmResolveBtn.addEventListener('click', () => statusForm.submit());
+    if (cancelResolveBtn) cancelResolveBtn.addEventListener('click', () => { resolveModal.classList.add('hidden'); statusSelect && statusSelect.focus(); });
+</script>
+
+<script>
+    // Client-side file validation constants (mirror server limits)
+    const MAX_UPLOAD_SIZE = 5 * 1024 * 1024; // 5MB
+    const ALLOWED_UPLOAD_TYPES = [
+        'image/jpeg','image/png','image/gif','application/pdf','audio/wav','audio/mpeg','audio/mp3'
+    ];
+
+    // Chat form validation
+    const chatForm = document.getElementById('chat-form');
+    const chatAttachment = document.getElementById('chat-attachment');
+    const chatAttachmentError = document.getElementById('chat-attachment-error');
+    const chatSend = document.getElementById('chat-send');
+    const chatMessage = document.getElementById('chat-message');
+
+    function validateFileInput(file) {
+        if (!file) return { ok: true };
+        if (file.size > MAX_UPLOAD_SIZE) return { ok: false, msg: 'File too large (max 5 MB).' };
+        if (!ALLOWED_UPLOAD_TYPES.includes(file.type)) return { ok: false, msg: 'Unsupported file type.' };
+        return { ok: true };
+    }
+
+    if (chatAttachment) {
+        chatAttachment.setAttribute('accept', '.jpg,.jpeg,.png,.gif,.pdf,.wav,.mp3');
+        chatAttachment.addEventListener('change', (e) => {
+            const f = e.target.files[0];
+            const res = validateFileInput(f);
+            if (!res.ok) {
+                chatAttachmentError.innerText = res.msg;
+                chatAttachmentError.classList.remove('hidden');
+                if (chatSend) chatSend.disabled = true;
+            } else {
+                chatAttachmentError.classList.add('hidden');
+                if (chatSend) chatSend.disabled = false;
+                const preview = document.getElementById('file-name-preview');
+                if (preview) { preview.innerText = 'Selected: ' + f.name; preview.classList.remove('hidden'); }
+            }
+        });
+    }
+
+    if (chatForm) {
+        chatForm.addEventListener('submit', (e) => {
+            const f = chatAttachment && chatAttachment.files.length ? chatAttachment.files[0] : null;
+            const res = validateFileInput(f);
+            if (!res.ok) {
+                e.preventDefault();
+                if (chatAttachmentError) { chatAttachmentError.innerText = res.msg; chatAttachmentError.classList.remove('hidden'); }
+            }
+        });
+    }
+
+</script>
+
+<style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
 {% endblock %}

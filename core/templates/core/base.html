@@ -2,67 +2,186 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SafeCampus | Student Safety Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        :root{
+            --brand-600: #4f46e5; /* indigo-600 */
+            --brand-700: #4338ca; /* indigo-700 */
+            --muted: #94a3b8; /* slate-400 */
+            --surface: #ffffff;
+            --radius-lg: 1rem;
+            --focus-ring: rgba(79,70,229,0.18);
+            --shadow-sm: 0 6px 18px rgba(15,23,42,0.06);
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        #nav-menu { transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1); }
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .menu-open { overflow: hidden; }
+
+        /* Design tokens: button utilities */
+        .btn-primary{ background:var(--brand-600); color:#fff; padding:0.6rem 1.1rem; border-radius:var(--radius-lg); font-weight:800; box-shadow:var(--shadow-sm); display:inline-flex; align-items:center; gap:.5rem; }
+        .btn-primary:hover{ background:var(--brand-700); transform:translateY(-1px); }
+        .btn-secondary{ background: #f8fafc; color: #0f172a; padding:0.5rem 0.9rem; border-radius:calc(var(--radius-lg) - 0.25rem); border:1px solid #e6eef8; font-weight:700; }
+        .btn-ghost{ background:transparent; color:var(--muted); padding:0.45rem 0.8rem; border-radius:0.75rem; }
+
+        /* Focus ring for keyboard users */
+        :focus-visible{ outline: 3px solid var(--focus-ring); outline-offset: 3px; border-radius: 0.6rem; }
+
+        /* Input focus polish */
+        .input-focus:focus{ box-shadow: 0 6px 18px rgba(79,70,229,0.06); border-color: var(--brand-600); }
+
+        /* Mobile spacing & sticky actions */
+        @media (max-width: 768px){
+            .sticky-action-target{ position:fixed; left:1rem; right:1rem; bottom:1rem; z-index:120; padding:0.6rem; border-radius:1.25rem; box-shadow:0 10px 30px rgba(2,6,23,0.12); background:linear-gradient(180deg, rgba(255,255,255,0.96), rgba(249,250,255,0.9)); display:flex; gap:.5rem; align-items:center; }
+            main { padding-bottom: 6.5rem; }
+        }
+        /* Custom scrollbar for better UI */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen">
+<body class="bg-slate-50 min-h-screen flex flex-col pb-20 md:pb-0">
 
-    <nav class="bg-white border-b border-slate-100 py-4 px-6 flex justify-between items-center sticky top-0 z-[90]">
-        <a href="{% url 'home' %}" class="text-2xl font-black text-slate-900 tracking-tighter">Safe<span class="text-indigo-600">Campus</span></a>
-        
-        <div class="flex items-center gap-6">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:inline-block absolute left-4 top-4 bg-indigo-600 text-white px-3 py-2 rounded-md z-[200]">Skip to content</a>
+
+    <nav class="glass border-b border-slate-100 py-4 px-6 md:px-12 sticky top-0 z-[90]" role="navigation" aria-label="Main navigation">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="{% url 'home' %}" class="text-2xl font-black text-slate-900 tracking-tighter">
+                Safe<span class="text-indigo-600">Campus</span>
+            </a>
+            
+            <div class="hidden md:flex items-center gap-8">
+                {% if user.is_authenticated %}
+                    {% if user.is_superuser or user.role == 'admin' %}
+                        <a href="{% url 'admin_dashboard' %}" class="text-sm font-bold text-slate-600 hover:text-indigo-600 transition">Admin Panel</a>
+                    {% elif user.role == 'counsellor' %}
+                        <a href="{% url 'counsellor_dashboard' %}" class="text-sm font-bold text-slate-600 hover:text-indigo-600 transition">Counsellor Hub</a>
+                    {% else %}
+                        <a href="{% url 'student_dashboard' %}" class="text-sm font-bold text-slate-600 hover:text-indigo-600 transition">Dashboard</a>
+                    {% endif %}
+
+                    <a href="{% url 'report_incident' %}" class="text-sm font-bold text-slate-600 hover:text-rose-600 transition">File Report</a>
+
+                    <div class="h-4 w-[1px] bg-slate-200"></div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Hi, {{ user.username }}</span>
+                        <a href="{% url 'logout' %}" class="bg-slate-900 text-white px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-rose-600 transition shadow-lg shadow-slate-200">Logout</a>
+                    </div>
+                {% else %}
+                    <a href="{% url 'login' %}" class="text-sm font-bold text-slate-900 uppercase">Login</a>
+                    <a href="{% url 'register' %}" class="bg-indigo-600 text-white px-6 py-2.5 rounded-xl text-sm font-black uppercase tracking-widest shadow-lg shadow-indigo-100 transition hover:scale-105">Join</a>
+                {% endif %}
+            </div>
+
+            <button onclick="toggleMenu()" class="md:hidden p-2 bg-slate-100 rounded-xl" aria-expanded="false" aria-controls="nav-menu" id="mobile-menu-toggle">
+                <svg id="menu-icon" class="w-6 h-6 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+
+        <div id="nav-menu" class="hidden fixed inset-0 top-[73px] bg-white z-[85] p-8 flex-col gap-6 md:hidden">
             {% if user.is_authenticated %}
-                <span class="text-sm font-bold text-slate-500 uppercase tracking-widest">Hi, {{ user.username }}</span>
-                <a href="{% url 'logout' %}" class="text-xs font-black text-rose-500 uppercase tracking-widest border-2 border-rose-100 px-4 py-2 rounded-xl hover:bg-rose-50 transition">Logout</a>
+                <p class="text-xs font-black text-slate-400 uppercase tracking-widest">Navigation</p>
+                <a href="{% url 'home' %}" class="text-3xl font-black text-slate-900">Dashboard</a>
+                <a href="{% url 'report_incident' %}" class="text-3xl font-black text-slate-900">New Report</a>
+                <div class="mt-auto">
+                    <a href="{% url 'logout' %}" class="block w-full text-center py-5 bg-rose-50 text-rose-600 rounded-2xl font-black text-lg">Logout</a>
+                </div>
             {% else %}
-                <a href="{% url 'login' %}" class="text-sm font-black text-slate-900 uppercase">Login</a>
-                <a href="{% url 'register' %}" class="bg-slate-900 text-white px-6 py-2 rounded-xl text-sm font-black uppercase">Join</a>
+                <a href="{% url 'login' %}" class="text-4xl font-black text-slate-900">Login</a>
+                <a href="{% url 'register' %}" class="text-4xl font-black text-indigo-600">Register</a>
             {% endif %}
         </div>
     </nav>
 
-    <main>
+    <main id="main-content" role="main" class="flex-grow w-full max-w-7xl mx-auto py-6">
+        {% if messages %}
+        <div class="px-4 md:px-0 mb-6">
+            <div class="max-w-7xl mx-auto space-y-3">
+                {% for message in messages %}
+                <div role="status" aria-live="polite" class="p-3 rounded-2xl shadow-sm border-l-4 {% if message.tags %}{% if 'error' in message.tags %}border-rose-500 bg-rose-50 text-rose-700{% elif 'warning' in message.tags %}border-amber-400 bg-amber-50 text-amber-700{% else %}border-emerald-400 bg-emerald-50 text-emerald-700{% endif %}{% else %}border-emerald-400 bg-emerald-50 text-emerald-700{% endif %}">
+                    <div class="flex items-start gap-3">
+                        <div class="text-sm font-bold">{{ message }}</div>
+                        <button onclick="this.parentElement.parentElement.remove()" class="ml-auto text-slate-400 hover:text-slate-700">✕</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
         {% block content %}
         {% endblock %}
     </main>
 
+    {% if user.is_authenticated %}
+    <div class="md:hidden fixed bottom-6 left-6 right-6 z-[100]">
+        <nav class="bg-slate-900/95 backdrop-blur-xl rounded-[2.5rem] border border-white/10 shadow-2xl h-16 flex items-center justify-around px-2">
+            <a href="{% url 'home' %}" class="flex flex-col items-center justify-center w-12 h-12 rounded-full text-white/50 hover:text-white transition">
+                <i class="fas fa-chart-pie text-lg"></i>
+                <span class="text-[8px] font-black uppercase mt-0.5">Stats</span>
+            </a>
+            
+            <a href="{% url 'report_incident' %}" class="flex items-center justify-center w-14 h-14 bg-indigo-600 rounded-full border-4 border-slate-50 -mt-10 shadow-xl shadow-indigo-500/40 active:scale-90 transition-transform">
+                <i class="fas fa-plus text-white text-xl"></i>
+            </a>
+
+            <a href="#" class="flex flex-col items-center justify-center w-12 h-12 rounded-full text-white/50 hover:text-white transition">
+                <i class="fas fa-comment-dots text-lg"></i>
+                <span class="text-[8px] font-black uppercase mt-0.5">Chat</span>
+            </a>
+        </nav>
+    </div>
+    {% endif %}
+
     {% if user.is_authenticated and user.role == 'student' %}
-    <div class="fixed bottom-8 right-8 z-[100]">
-        <button id="sosBtn" class="w-20 h-20 bg-rose-600 text-white rounded-full shadow-2xl flex flex-col items-center justify-center border-4 border-white animate-pulse hover:scale-110 transition-transform">
-            <span class="text-[10px] font-black uppercase tracking-widest">Help</span>
-            <span class="text-xl font-black">SOS</span>
+    <div class="fixed top-24 right-4 z-[80] md:bottom-10 md:right-10 md:top-auto">
+        <button id="sosBtn" class="w-14 h-14 md:w-24 md:h-24 bg-rose-600 text-white rounded-full shadow-[0_0_30px_rgba(225,29,72,0.4)] flex flex-col items-center justify-center border-2 md:border-4 border-white animate-pulse active:scale-95 transition-all">
+            <span class="text-[8px] md:text-[10px] font-black uppercase">Help</span>
+            <span class="text-base md:text-2xl font-black italic">SOS</span>
         </button>
     </div>
 
     <div id="sosModal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-xl z-[110] hidden flex items-center justify-center p-6">
-        <div class="bg-white w-full max-w-sm rounded-[3rem] p-8 text-center shadow-2xl">
+        <div class="bg-white w-full max-w-sm rounded-[3rem] p-8 text-center shadow-2xl border border-white/20">
             <div id="callUI">
-                <div class="w-24 h-24 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <span class="text-4xl animate-bounce">📞</span>
+                <div class="w-24 h-24 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-6 relative">
+                    <div class="absolute inset-0 rounded-full bg-rose-400 animate-ping opacity-20"></div>
+                    <span class="text-4xl">📞</span>
                 </div>
-                <h2 class="text-2xl font-black text-slate-900">Calling Help...</h2>
-                <p class="text-slate-500 mb-8 font-medium">Connecting to Campus Staff</p>
-                <button onclick="closeSOS()" class="w-full py-4 bg-slate-100 text-slate-600 rounded-2xl font-black">Cancel</button>
+                <h2 class="text-2xl font-black text-slate-900 tracking-tight">Contacting Staff</h2>
+                <p class="text-slate-500 mb-8 font-medium">Hold on, we're alerting security.</p>
+                <button onclick="closeSOS()" class="w-full py-4 bg-slate-100 text-slate-600 rounded-2xl font-black active:scale-95 transition">Cancel</button>
             </div>
 
             <div id="recordUI" class="hidden">
-                <div class="w-24 h-24 bg-rose-600 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
-                    <span class="text-white text-3xl">🎙️</span>
+                <div class="w-24 h-24 bg-rose-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl shadow-rose-200">
+                    <span class="text-white text-3xl animate-pulse">🎙️</span>
                 </div>
-                <h2 class="text-2xl font-black text-rose-600">No Answer.</h2>
-                <p class="text-slate-500 mb-6 text-sm">Counsellor is busy. Your live voicemail is being recorded and sent with location data.</p>
-                <div id="timer" class="text-3xl font-mono font-black mb-8">00:00</div>
-                <button id="stopRecord" class="w-full py-4 bg-rose-600 text-white rounded-2xl font-black shadow-lg shadow-rose-200">End & Send Log</button>
+                <h2 class="text-xl font-black text-rose-600 uppercase tracking-widest">Recording...</h2>
+                <div id="timer" class="text-4xl font-mono font-black my-6 text-slate-900">00:00</div>
+                <button id="stopRecord" class="w-full py-5 bg-rose-600 text-white rounded-2xl font-black shadow-lg shadow-rose-200 active:scale-95 transition">End & Send Report</button>
             </div>
         </div>
     </div>
+    {% endif %}
 
     <script>
+        function toggleMenu() {
+            const menu = document.getElementById('nav-menu');
+            const body = document.body;
+            menu.classList.toggle('hidden');
+            menu.classList.toggle('flex');
+            body.classList.toggle('menu-open');
+            const btn = document.getElementById('mobile-menu-toggle');
+            if (btn) btn.setAttribute('aria-expanded', String(!menu.classList.contains('hidden')));
+        }
+
+        // SOS Script Logic
         const sosBtn = document.getElementById('sosBtn');
         const modal = document.getElementById('sosModal');
         const callUI = document.getElementById('callUI');
@@ -70,12 +189,14 @@
         let mediaRecorder;
         let audioChunks = [];
 
-        sosBtn.onclick = () => {
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                if(!modal.classList.contains('hidden')) startVoicemail();
-            }, 4000);
-        };
+        if(sosBtn) {
+            sosBtn.onclick = () => {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    if(!modal.classList.contains('hidden')) startVoicemail();
+                }, 4000);
+            };
+        }
 
         function closeSOS() { modal.classList.add('hidden'); }
 
@@ -86,27 +207,75 @@
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 mediaRecorder = new MediaRecorder(stream);
                 mediaRecorder.start();
+                
+                let sec = 0;
+                setInterval(() => {
+                    sec++;
+                    let m = Math.floor(sec/60);
+                    let s = sec%60;
+                    document.getElementById('timer').innerText = `${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
+                }, 1000);
+
                 mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
                 mediaRecorder.onstop = async () => {
                     const blob = new Blob(audioChunks, { type: 'audio/wav' });
                     const formData = new FormData();
                     formData.append('audio_data', blob);
                     formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
-                    const response = await fetch('/handle-sos/', { method: 'POST', body: formData });
+                    const response = await fetch('{% url "handle_sos_recording" %}', { method: 'POST', body: formData });
                     if (response.ok) {
-                        modal.innerHTML = "<div class='p-10 text-center'><h2 class='text-2xl font-black text-emerald-600'>SOS Logged. Help is on the way.</h2></div>";
+                        modal.innerHTML = "<div class='p-12 text-center'><h2 class='text-3xl font-black text-emerald-600 mb-2'>Sent.</h2><p class='text-slate-500 font-bold'>Authorities have been notified.</p></div>";
                         setTimeout(() => location.reload(), 2000);
                     }
                 };
             } catch (err) {
-                alert("Microphone access is required for SOS voice log.");
+                alert("Microphone required for SOS.");
+                closeSOS();
             }
         }
 
-        document.getElementById('stopRecord').onclick = () => { if(mediaRecorder) mediaRecorder.stop(); };
+        const stopBtn = document.getElementById('stopRecord');
+        if(stopBtn) stopBtn.onclick = () => { if(mediaRecorder) mediaRecorder.stop(); };
     </script>
-    {% endif %}
+    <script>
+        // Microinteractions: subtle press states and toast pause on hover
+        document.addEventListener('pointerdown', (e) => {
+            const btn = e.target.closest('button, a');
+            if (btn) btn.style.transform = 'translateY(-1px) scale(0.997)';
+        });
+        document.addEventListener('pointerup', (e) => {
+            const btn = e.target.closest('button, a');
+            if (btn) btn.style.transform = '';
+        });
 
+        // Pause auto-dismiss of toasts when hovered
+        document.addEventListener('DOMContentLoaded', () => {
+            const toasts = document.querySelectorAll('main [role="status"]');
+            toasts.forEach((t) => {
+                t.addEventListener('mouseenter', () => t.dataset.pause = '1');
+                t.addEventListener('mouseleave', () => delete t.dataset.pause);
+            });
+        });
+    </script>
+    <script>
+        // Auto-dismiss flashed messages after a short delay for non-critical notices
+        document.addEventListener('DOMContentLoaded', () => {
+            const msgContainers = document.querySelectorAll('main [role="status"]');
+            msgContainers.forEach((el) => {
+                // Do not auto-dismiss errors immediately
+                const text = el.innerText || '';
+                const isError = /error|failed|forbidden/i.test(text);
+                if (!isError) {
+                    setTimeout(() => {
+                        el.style.transition = 'opacity 300ms ease, transform 300ms ease';
+                        el.style.opacity = '0';
+                        el.style.transform = 'translateY(-6px)';
+                        setTimeout(() => el.remove(), 350);
+                    }, 4200);
+                }
+            });
+        });
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

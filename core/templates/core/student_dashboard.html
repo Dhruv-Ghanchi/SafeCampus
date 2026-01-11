@@ -1,58 +1,251 @@
-{% extends 'core/base.html' %}
-{% block content %}
-<div class="max-w-6xl mx-auto">
-    <div class="flex justify-between items-center mb-8">
-        <h2 class="text-3xl font-bold text-gray-800">My Reports & Tracking</h2>
-        <a href="{% url 'report_incident' %}" class="bg-rose-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-rose-700">
-            + Report New Incident
-        </a>
-    </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeCampus | Student Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.01em; }
+        .bento-card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .bento-card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
+        .status-pill { font-size: 10px; letter-spacing: 0.05em; font-weight: 800; }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-[#F8FAFC] flex min-h-screen text-[#1E293B]">
 
-    <div class="space-y-6">
-        {% for report in reports %}
-        <div class="bg-white rounded-xl shadow-sm border p-6">
-            <div class="flex justify-between items-start mb-4">
-                <div>
-                    <span class="text-xs font-bold text-rose-600 uppercase tracking-widest">Case #{{ report.case_token }}</span>
-                    <h3 class="text-xl font-bold text-gray-900">{{ report.title }}</h3>
+    <aside class="w-72 bg-white border-r border-slate-200 flex-shrink-0 hidden lg:flex flex-col">
+        <div class="p-8">
+            <div class="flex items-center gap-3">
+                <div class="h-10 w-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200">
+                    <i class="fas fa-shield-halved text-white text-xl"></i>
                 </div>
-                <div class="flex items-center gap-3">
-                    <span class="px-3 py-1 rounded-full text-xs font-bold 
-                        {% if report.status == 'New' %}bg-blue-100 text-blue-700
-                        {% elif report.status == 'Resolved' %}bg-green-100 text-green-700
-                        {% else %}bg-yellow-100 text-yellow-700{% endif %}">
-                        {{ report.status }}
-                    </span>
-                    <a href="{% url 'student_incident_detail' report.id %}" class="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-md font-bold text-xs hover:bg-indigo-100 transition">
-                        View Details & Chat →
+                <span class="text-xl font-extrabold tracking-tighter text-slate-900">SafeCampus</span>
+            </div>
+        </div>
+        
+        <nav class="flex-1 px-4 space-y-1">
+            <p class="px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Main Menu</p>
+            <a href="{% url 'home' %}" class="flex items-center px-4 py-3 text-indigo-600 bg-indigo-50/50 rounded-xl font-semibold transition-all">
+                <i class="fas fa-house-user mr-3 text-lg"></i> Dashboard
+            </a>
+            <a href="{% url 'report_incident' %}" class="flex items-center px-4 py-3 text-slate-500 hover:text-indigo-600 hover:bg-slate-50 rounded-xl font-medium transition-all group">
+                <i class="fas fa-paper-plane mr-3 text-lg group-hover:scale-110 transition-transform"></i> New Report
+            </a>
+            <a href="{% url 'resources' %}" class="flex items-center px-4 py-3 text-slate-500 hover:text-indigo-600 hover:bg-slate-50 rounded-xl font-medium transition-all group">
+                <i class="fas fa-book-bookmark mr-3 text-lg group-hover:scale-110 transition-transform"></i> Knowledge Hub
+            </a>
+        </nav>
+
+        <div class="p-4 mt-auto">
+            <div class="bg-slate-900 rounded-2xl p-5 text-white shadow-xl relative overflow-hidden">
+                <div class="relative z-10">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="h-10 w-10 bg-indigo-500 rounded-lg flex items-center justify-center font-bold text-lg">
+                            {{ user.username|first|upper }}
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-400 font-medium">Logged in as</p>
+                            <p class="text-sm font-bold truncate w-32">@{{ user.username }}</p>
+                        </div>
+                    </div>
+                    <a href="{% url 'logout' %}" class="flex items-center justify-center gap-2 w-full py-2 bg-white/10 hover:bg-white/20 rounded-lg text-xs font-bold transition-all">
+                        <i class="fas fa-sign-out-alt"></i> Secure Logout
                     </a>
                 </div>
-            </div>
-
-            {% if report.is_anonymous %}
-            <div class="bg-rose-50 border border-rose-100 p-4 rounded-lg mb-4">
-                <p class="text-rose-800 text-sm mb-3">
-                    <strong>Anonymous Report:</strong> Reveal identity to enable secure chat with a counsellor.
-                </p>
-                <form action="{% url 'reveal_identity' report.id %}" method="post">
-                    {% csrf_token %}
-                    <button type="submit" class="bg-rose-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-rose-700">
-                        Reveal Identity Now
-                    </button>
-                </form>
-            </div>
-            {% endif %}
-
-            <div class="text-sm text-gray-500 flex gap-4">
-                <span><strong>Location:</strong> {{ report.location }}</span>
-                <span><strong>Date:</strong> {{ report.reported_at|date:"M d, Y" }}</span>
+                <div class="absolute -bottom-4 -right-4 w-20 h-20 bg-indigo-600/20 rounded-full blur-2xl"></div>
             </div>
         </div>
-        {% empty %}
-        <div class="text-center py-20 bg-white rounded-xl border-2 border-dashed">
-            <p class="text-gray-400">You haven't filed any reports yet.</p>
+    </aside>
+
+    <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        
+        <header class="h-20 bg-white/80 backdrop-blur-md border-b border-slate-200 px-8 flex justify-between items-center sticky top-0 z-20">
+            <h2 class="text-lg font-bold text-slate-800">Student Dashboard</h2>
+            <div class="flex items-center gap-4">
+                <div class="hidden md:flex items-center px-3 py-1.5 bg-green-50 border border-green-100 rounded-full">
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2"></span>
+                    <span class="text-[10px] font-bold text-green-700 uppercase tracking-wider">End-to-End Encrypted</span>
+                </div>
+                <button class="h-10 w-10 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 transition-all">
+                    <i class="fas fa-bell text-lg"></i>
+                </button>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-8 space-y-8">
+            
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Welcome back, {{ user.username }}</h1>
+                    <p class="text-slate-500 mt-1 font-medium">Your safety is our priority. Monitor your active reports below.</p>
+                </div>
+                <a href="{% url 'report_incident' %}" class="inline-flex items-center justify-center px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl shadow-lg shadow-red-200 transition-all active:scale-95">
+                    <i class="fas fa-plus mr-2"></i> Report Incident
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bento-card bg-white p-6 rounded-[2rem] border border-slate-200 flex flex-col justify-between min-h-[160px]">
+                    <div class="h-12 w-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600">
+                        <i class="fas fa-folder-open text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-4xl font-extrabold text-slate-900">{{ reports.count }}</p>
+                        <p class="text-sm font-semibold text-slate-400 uppercase tracking-wider">Total Reports Filed</p>
+                    </div>
+                </div>
+                <div class="bento-card bg-indigo-600 p-6 rounded-[2rem] text-white flex flex-col justify-between min-h-[160px] shadow-xl shadow-indigo-100">
+                    <div class="h-12 w-12 bg-white/20 rounded-2xl flex items-center justify-center">
+                        <i class="fas fa-user-secret text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-4xl font-extrabold">Active</p>
+                        <p class="text-sm font-semibold opacity-80 uppercase tracking-wider">Privacy Shield Status</p>
+                    </div>
+                </div>
+                <div class="bento-card bg-white p-6 rounded-[2rem] border border-slate-200 flex flex-col justify-between min-h-[160px]">
+                    <div class="h-12 w-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600">
+                        <i class="fas fa-circle-check text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-4xl font-extrabold text-slate-900">0</p>
+                        <p class="text-sm font-semibold text-slate-400 uppercase tracking-wider">Resolved Cases</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden">
+                <div class="px-8 py-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50/30">
+                    <h3 class="font-bold text-slate-800">Recent Incidents</h3>
+                    <div class="relative w-full sm:w-64">
+                        <input type="text" id="incidentSearch" placeholder="Search cases..." 
+                               class="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 transition-all outline-none bg-white">
+                        <i class="fas fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="text-[11px] font-bold text-slate-400 uppercase tracking-[0.15em]">
+                                <th class="px-8 py-5">Case Reference</th>
+                                <th class="px-8 py-5">Subject</th>
+                                <th class="px-8 py-5">Date Posted</th>
+                                <th class="px-8 py-5">Status</th>
+                                <th class="px-8 py-5 text-right">Interaction</th>
+                            </tr>
+                        </thead>
+                        <tbody id="incidentTable" class="divide-y divide-slate-100">
+                            {% for incident in reports %}
+                            <tr class="group hover:bg-slate-50/80 transition-all incident-row">
+                                <td class="px-8 py-6">
+                                    <span class="font-mono text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100">
+                                        #{{ incident.case_token }}
+                                    </span>
+                                </td>
+                                <td class="px-8 py-6">
+                                    <div class="flex flex-col">
+                                        <span class="font-bold text-slate-900">{{ incident.title }}</span>
+                                        {% if incident.is_anonymous %}
+                                        <span class="mt-1 flex items-center text-[10px] font-bold text-indigo-500">
+                                            <i class="fas fa-mask mr-1.5"></i> PROTECTED IDENTITY
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td class="px-8 py-6 text-sm text-slate-500 font-medium">
+                                    {{ incident.reported_at|date:"d M Y" }}
+                                </td>
+                                <td class="px-8 py-6">
+                                    <span class="status-pill inline-flex px-3 py-1 rounded-full uppercase
+                                        {% if incident.status == 'Resolved' %} bg-emerald-100 text-emerald-700 
+                                        {% elif incident.is_emergency %} bg-red-100 text-red-700 animate-pulse 
+                                        {% else %} bg-slate-100 text-slate-600 {% endif %}">
+                                        {{ incident.status }}
+                                    </span>
+                                </td>
+                                <td class="px-8 py-6">
+                                    <div class="flex justify-end items-center gap-3 w-48 ml-auto">
+                                        <a href="{% url 'chat_view' incident.id %}" class="shrink-0 h-10 px-5 bg-slate-900 hover:bg-indigo-600 text-white rounded-xl text-xs font-bold flex items-center justify-center transition-all shadow-md">
+                                            <i class="fas fa-comment-dots mr-2"></i> Chat
+                                        </a>
+                                        {% if incident.is_anonymous %}
+                                        <form action="{% url 'reveal_identity' incident.id %}" method="POST" class="inline shrink-0">
+                                            {% csrf_token %}
+                                            <button type="submit" class="h-10 w-10 flex items-center justify-center border border-slate-200 rounded-xl text-slate-400 hover:text-red-600 hover:border-red-100 transition-all" title="Reveal Identity">
+                                                <i class="fas fa-eye-slash"></i>
+                                            </button>
+                                        </form>
+                                        {% else %}
+                                        <div class="w-10"></div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr id="emptyState">
+                                <td colspan="5" class="px-8 py-32 text-center">
+                                    <div class="max-w-sm mx-auto">
+                                        <div class="h-20 w-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                                            <i class="fas fa-inbox text-slate-200 text-3xl"></i>
+                                        </div>
+                                        <h4 class="text-xl font-bold text-slate-900">Your feed is empty</h4>
+                                        <p class="text-slate-500 text-sm mt-2">Everything seems safe right now. If you need to report something, use the button above.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            <tr id="noResults" class="hidden">
+                                <td colspan="5" class="px-8 py-20 text-center text-slate-500 font-medium">
+                                    No cases match your search criteria.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-        {% endfor %}
+    </main>
+
+    <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-4 flex justify-around items-center z-50">
+        <a href="{% url 'home' %}" class="text-indigo-600"><i class="fas fa-house text-xl"></i></a>
+        <a href="{% url 'report_incident' %}" class="h-12 w-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg -mt-10 border-4 border-[#F8FAFC]"><i class="fas fa-plus"></i></a>
+        <a href="{% url 'resources' %}" class="text-slate-400"><i class="fas fa-book text-xl"></i></a>
     </div>
-</div>
-{% endblock %}
+
+    <script>
+        document.getElementById('incidentSearch').addEventListener('keyup', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('.incident-row');
+            const noResults = document.getElementById('noResults');
+            let hasVisibleRows = false;
+
+            rows.forEach(row => {
+                // Searches Title and Case Token
+                const title = row.querySelector('td:nth-child(2)').innerText.toLowerCase();
+                const token = row.querySelector('td:nth-child(1)').innerText.toLowerCase();
+                
+                if (title.includes(searchTerm) || token.includes(searchTerm)) {
+                    row.style.display = "";
+                    hasVisibleRows = true;
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            // Show/Hide "No Results" message
+            if (noResults) {
+                noResults.classList.toggle('hidden', hasVisibleRows || searchTerm === "");
+            }
+        });
+    </script>
+
+</body>
+</html>

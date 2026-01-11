@@ -29,7 +29,7 @@
             </div>
 
             <div>
-                <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Emergency Resources</h3>
+                <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Immediate Emergency Resources</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {% for link in helplines %}
                     <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-center gap-4 hover:border-indigo-200 transition-colors">
@@ -43,14 +43,22 @@
                 </div>
             </div>
 
-            <div class="flex flex-col md:flex-row gap-4 pt-4">
-                <a href="{% url 'student_dashboard' %}" 
-                   class="flex-1 bg-slate-900 text-white text-center py-4 rounded-2xl font-black shadow-lg shadow-slate-200 hover:bg-indigo-600 transition-all uppercase tracking-widest text-xs">
-                    View My Dashboard
-                </a>
+            <div class="flex flex-col space-y-4">
+                <div class="flex flex-col md:flex-row gap-4 pt-4">
+                    <a href="{% url 'chat_view' incident.id %}" 
+                       class="flex-[2] bg-indigo-600 text-white text-center py-4 rounded-2xl font-black shadow-lg shadow-indigo-200 hover:bg-indigo-700 hover:-translate-y-1 transition-all uppercase tracking-widest text-xs flex items-center justify-center gap-2">
+                        <span>💬</span> Open Secure Chat
+                    </a>
+                    
+                    <a href="{% url 'student_dashboard' %}" 
+                       class="flex-1 bg-slate-900 text-white text-center py-4 rounded-2xl font-black shadow-lg shadow-slate-200 hover:bg-slate-800 transition-all uppercase tracking-widest text-xs flex items-center justify-center">
+                        Dashboard
+                    </a>
+                </div>
+                
                 <button onclick="window.print()" 
-                        class="flex-1 bg-white border-2 border-slate-100 text-slate-600 py-4 rounded-2xl font-black hover:bg-slate-50 transition-all uppercase tracking-widest text-xs">
-                    Save Receipt
+                        class="w-full bg-white border-2 border-slate-100 text-slate-600 py-3 rounded-2xl font-black hover:bg-slate-50 transition-all uppercase tracking-widest text-[10px]">
+                    🖨️ Download Report Receipt
                 </button>
             </div>
         </div>

@@ -1,0 +1,90 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="max-w-4xl mx-auto py-6 md:py-12 px-4">
+    
+    <div class="flex items-center justify-between mb-8">
+        <div class="flex items-center gap-4">
+            <a href="{% url 'dashboard' %}" class="w-10 h-10 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-400 hover:text-indigo-600 transition-all shadow-sm">
+                ←
+            </a>
+            <div>
+                <h2 class="text-2xl font-black text-slate-900 tracking-tight">Support Chat</h2>
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Connected to Staff</p>
+                </div>
+            </div>
+        </div>
+        <div class="hidden md:block">
+            <span class="text-[10px] font-black bg-indigo-50 text-indigo-600 px-4 py-2 rounded-full uppercase tracking-widest">
+                Case #{{ incident.case_token|default:incident.id }}
+            </span>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-[3rem] shadow-2xl shadow-slate-200/60 border border-slate-50 overflow-hidden flex flex-col h-[600px] md:h-[700px]">
+        
+        <div class="p-6 bg-slate-50 border-b border-slate-100 flex items-center gap-4">
+            <div class="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-xl shadow-lg shadow-indigo-100">
+                🛡️
+            </div>
+            <div>
+                <p class="text-sm font-black text-slate-900">Campus Safety Officer</p>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Verified Professional Response Team</p>
+            </div>
+        </div>
+
+        <div class="flex-1 p-6 md:p-10 overflow-y-auto space-y-8 no-scrollbar bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px]">
+            
+            <div class="flex justify-center mb-10">
+                <div class="bg-white border border-slate-100 px-6 py-3 rounded-2xl shadow-sm text-center">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Your Reported Incident</p>
+                    <p class="text-xs font-bold text-slate-700">"{{ incident.title }}"</p>
+                </div>
+            </div>
+
+            {% for msg in incident.messages.all %}
+                <div class="flex {% if msg.sender == user %}justify-end{% else %}justify-start{% endif %}">
+                    <div class="max-w-[85%] md:max-w-[70%]">
+                        <div class="p-5 rounded-[2rem] text-sm shadow-sm 
+                            {% if msg.sender == user %}
+                                bg-indigo-600 text-white rounded-tr-none
+                            {% else %}
+                                bg-white border border-slate-100 text-slate-800 rounded-tl-none
+                            {% endif %}">
+                            <p class="leading-relaxed font-medium">{{ msg.text }}</p>
+                        </div>
+                        <p class="text-[9px] mt-2 font-black text-slate-400 uppercase px-2 {% if msg.sender == user %}text-right{% endif %}">
+                            {{ msg.created_at|date:"P" }} {% if msg.sender == user %}• Delivered{% endif %}
+                        </p>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="flex flex-col items-center justify-center h-full text-center space-y-4 opacity-40">
+                    <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center text-3xl">🤝</div>
+                    <p class="text-sm font-black uppercase tracking-widest">A counsellor will reach out shortly.</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="p-6 bg-white border-t border-slate-100">
+            {% if incident.is_anonymous and not incident.is_identity_revealed %}
+                <div class="bg-slate-50 p-4 rounded-2xl text-center border border-dashed border-slate-200">
+                    <p class="text-xs font-bold text-slate-400">
+                        Chat is locked for anonymous reports to protect your privacy.
+                    </p>
+                </div>
+            {% else %}
+                <form method="post" class="relative flex items-center">
+                    {% csrf_token %}
+                    <input type="text" name="message" placeholder="Type a message..." 
+                           class="w-full pl-6 pr-20 py-5 bg-slate-50 border-none rounded-[2rem] text-sm font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-all" required>
+                    <button type="submit" class="absolute right-2 bg-indigo-600 text-white px-6 py-3 rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-slate-900 transition-all active:scale-95 shadow-lg shadow-indigo-100">
+                        Send
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

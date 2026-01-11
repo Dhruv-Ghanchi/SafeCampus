@@ -1,0 +1,154 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SafeCampus | Student Safety Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        #nav-menu { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        /* Prevent body scroll when menu is open on mobile */
+        .menu-open { overflow: hidden; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen flex flex-col pb-20 md:pb-0">
+
+    <nav class="glass border-b border-slate-100 py-4 px-6 md:px-12 sticky top-0 z-[90]">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="/" class="text-2xl font-black text-slate-900 tracking-tighter">
+                Safe<span class="text-indigo-600">Campus</span>
+            </a>
+            
+            <div class="hidden md:flex items-center gap-8">
+                
+                    <a href="/login/" class="text-sm font-bold text-slate-900 uppercase">Login</a>
+                    <a href="/register/" class="bg-indigo-600 text-white px-6 py-2.5 rounded-xl text-sm font-black uppercase tracking-widest shadow-lg shadow-indigo-100 transition hover:scale-105">Join</a>
+                
+            </div>
+
+            <button onclick="toggleMenu()" class="md:hidden p-2 bg-slate-100 rounded-xl">
+                <svg id="menu-icon" class="w-6 h-6 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+
+        <div id="nav-menu" class="hidden fixed inset-0 top-[73px] bg-white z-[85] p-8 flex-col gap-6 md:hidden">
+            
+                <a href="/login/" class="text-4xl font-black text-slate-900">Login</a>
+                <a href="/register/" class="text-4xl font-black text-indigo-600">Register</a>
+            
+        </div>
+    </nav>
+
+    <main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        
+<div class="max-w-md mx-auto py-20">
+    <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100">
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-black text-slate-900">Welcome Back</h2>
+            <p class="text-slate-400 text-sm mt-2">Login to the SafeCampus Portal</p>
+        </div>
+
+        <form method="post" class="space-y-6">
+            <input type="hidden" name="csrfmiddlewaretoken" value="3pNe5VOMG8OtOCu9Lx6x0YcOKlxmg2Q8WCW4fLZqmy5mpQhMZnhbhpjWCBZOnnNd">
+            
+            
+
+            <div>
+                <label class="block text-[10px] font-black uppercase text-slate-400 tracking-widest mb-2">Username</label>
+                <input type="text" name="username" class="w-full p-4 border rounded-2xl bg-slate-50 focus:ring-2 focus:ring-indigo-500 outline-none transition" required>
+            </div>
+
+            <div>
+                <label class="block text-[10px] font-black uppercase text-slate-400 tracking-widest mb-2">Password</label>
+                <input type="password" name="password" class="w-full p-4 border rounded-2xl bg-slate-50 focus:ring-2 focus:ring-indigo-500 outline-none transition" required>
+            </div>
+
+            <button type="submit" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black shadow-lg shadow-indigo-100 hover:scale-[1.02] transition-transform">
+                Sign In
+            </button>
+        </form>
+
+        <div class="mt-8 text-center pt-6 border-t">
+            <p class="text-xs text-slate-400">Don't have an account?</p>
+            <a href="/register/" class="text-indigo-600 font-bold text-sm hover:underline">Create an Account</a>
+        </div>
+    </div>
+</div>
+
+    </main>
+
+    
+
+    
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('nav-menu');
+            const body = document.body;
+            menu.classList.toggle('hidden');
+            menu.classList.toggle('flex');
+            body.classList.toggle('menu-open');
+        }
+
+        // SOS Script Logic
+        const sosBtn = document.getElementById('sosBtn');
+        const modal = document.getElementById('sosModal');
+        const callUI = document.getElementById('callUI');
+        const recordUI = document.getElementById('recordUI');
+        let mediaRecorder;
+        let audioChunks = [];
+
+        if(sosBtn) {
+            sosBtn.onclick = () => {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    if(!modal.classList.contains('hidden')) startVoicemail();
+                }, 4000);
+            };
+        }
+
+        function closeSOS() { modal.classList.add('hidden'); }
+
+        async function startVoicemail() {
+            callUI.classList.add('hidden');
+            recordUI.classList.remove('hidden');
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.start();
+                
+                let sec = 0;
+                setInterval(() => {
+                    sec++;
+                    let m = Math.floor(sec/60);
+                    let s = sec%60;
+                    document.getElementById('timer').innerText = `${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
+                }, 1000);
+
+                mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
+                mediaRecorder.onstop = async () => {
+                    const blob = new Blob(audioChunks, { type: 'audio/wav' });
+                    const formData = new FormData();
+                    formData.append('audio_data', blob);
+                    formData.append('csrfmiddlewaretoken', '3pNe5VOMG8OtOCu9Lx6x0YcOKlxmg2Q8WCW4fLZqmy5mpQhMZnhbhpjWCBZOnnNd');
+                    const response = await fetch('/handle-sos/', { method: 'POST', body: formData });
+                    if (response.ok) {
+                        modal.innerHTML = "<div class='p-12 text-center'><h2 class='text-3xl font-black text-emerald-600 mb-2'>Sent.</h2><p class='text-slate-500 font-bold'>Authorities have been notified.</p></div>";
+                        setTimeout(() => location.reload(), 2000);
+                    }
+                };
+            } catch (err) {
+                alert("Microphone required for SOS.");
+                closeSOS();
+            }
+        }
+
+        const stopBtn = document.getElementById('stopRecord');
+        if(stopBtn) stopBtn.onclick = () => { if(mediaRecorder) mediaRecorder.stop(); };
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SafeCampus | Student Safety Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        #nav-menu { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .menu-open { overflow: hidden; }
+        /* Custom scrollbar for better UI */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen flex flex-col pb-20 md:pb-0">
+
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:inline-block absolute left-4 top-4 bg-indigo-600 text-white px-3 py-2 rounded-md z-[200]">Skip to content</a>
+
+    <nav class="glass border-b border-slate-100 py-4 px-6 md:px-12 sticky top-0 z-[90]">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="/home/" class="text-2xl font-black text-slate-900 tracking-tighter">
+                Safe<span class="text-indigo-600">Campus</span>
+            </a>
+            
+            <div class="hidden md:flex items-center gap-8">
+                
+                    
+                        <a href="/counsellor/" class="text-sm font-bold text-slate-600 hover:text-indigo-600 transition">Counsellor Hub</a>
+                    
+
+                    <a href="/report/" class="text-sm font-bold text-slate-600 hover:text-rose-600 transition">File Report</a>
+
+                    <div class="h-4 w-[1px] bg-slate-200"></div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Hi, manual_counsellor</span>
+                        <a href="/logout/" class="bg-slate-900 text-white px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-rose-600 transition shadow-lg shadow-slate-200">Logout</a>
+                    </div>
+                
+            </div>
+
+            <button onclick="toggleMenu()" class="md:hidden p-2 bg-slate-100 rounded-xl">
+                <svg id="menu-icon" class="w-6 h-6 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+
+        <div id="nav-menu" class="hidden fixed inset-0 top-[73px] bg-white z-[85] p-8 flex-col gap-6 md:hidden">
+            
+                <p class="text-xs font-black text-slate-400 uppercase tracking-widest">Navigation</p>
+                <a href="/home/" class="text-3xl font-black text-slate-900">Dashboard</a>
+                <a href="/report/" class="text-3xl font-black text-slate-900">New Report</a>
+                <div class="mt-auto">
+                    <a href="/logout/" class="block w-full text-center py-5 bg-rose-50 text-rose-600 rounded-2xl font-black text-lg">Logout</a>
+                </div>
+            
+        </div>
+    </nav>
+
+    <main class="flex-grow w-full max-w-7xl mx-auto py-6">
+        
+        
+<style>
+    /* Utility to hide scrollbars while allowing swipe on filter bar */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
+
+<div class="max-w-7xl mx-auto px-4 py-6 md:py-10 space-y-8">
+    
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+        <div>
+            <div class="flex items-center gap-2 mb-2">
+                <span class="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></span>
+                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Live Case Monitor</span>
+            </div>
+            <h2 class="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter">Counsellor <span class="text-indigo-600">Portal</span></h2>
+            <p class="text-slate-500 font-medium mt-1">AI-Powered Sentiment Analysis Priority Queue</p>
+        </div>
+        
+        <div class="flex gap-3 w-full md:w-auto">
+            <div class="flex-1 md:flex-none bg-white border border-slate-100 p-4 rounded-[2rem] shadow-sm text-center">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Cases</p>
+                <p class="text-2xl font-black text-slate-900">8</p>
+            </div>
+            <div class="flex-1 md:flex-none bg-indigo-600 p-4 rounded-[2rem] shadow-lg shadow-indigo-100 text-center text-white">
+                <p class="text-[10px] font-black text-indigo-200 uppercase tracking-widest">Status</p>
+                <p class="text-2xl font-black italic">Active</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex flex-col md:flex-row gap-4 justify-between items-center">
+        <div class="flex gap-2 overflow-x-auto no-scrollbar w-full md:w-auto pb-2 md:pb-0">
+            <a href="?filter=all" 
+               class="px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap
+               bg-slate-900 text-white shadow-lg shadow-slate-200">
+                All Reports
+            </a>
+
+            <a href="?filter=critical" 
+               class="px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap
+               bg-white border border-slate-200 text-rose-600 hover:bg-rose-50">
+                Critical SOS
+            </a>
+
+            <a href="?filter=pending" 
+               class="px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap
+               bg-white border border-slate-200 text-slate-500 hover:bg-slate-50">
+                Pending Review
+            </a>
+        </div>
+
+        <form method="GET" class="relative w-full md:w-80 flex items-center gap-2">
+            <input type="hidden" name="filter" value="all">
+            <div class="relative group flex-1">
+                <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                    <svg class="w-4 h-4 text-slate-400 group-focus-within:text-indigo-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+                <input type="text" name="q" value="" 
+                       placeholder="Search Token or Student..." 
+                       class="w-full pl-11 pr-4 py-2.5 bg-white rounded-2xl border-none ring-1 ring-slate-200 focus:ring-2 focus:ring-indigo-500 text-[10px] font-black uppercase tracking-widest transition-all shadow-sm">
+            </div>
+
+            
+        </form>
+    </div>
+
+    <div class="bg-white rounded-[3rem] shadow-xl shadow-slate-200/50 overflow-hidden border border-slate-50">
+        <div class="hidden md:block overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50/50 text-[10px] uppercase font-black text-slate-400 tracking-widest">
+                        <th class="p-8">Case Info</th>
+                        <th class="p-8">Reporter</th>
+                        <th class="p-8">Safety Status</th>
+                        <th class="p-8">Sentiment</th>
+                        <th class="p-8 text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                    
+                    <tr class="group transition-all 
+                        
+                            bg-rose-50/60 border-l-4 border-rose-500
+                        ">
+                        
+                        <td class="p-8">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-mono font-black text-xs py-1 px-3 rounded-lg border 
+                                        bg-rose-100 border-rose-200 text-rose-600">
+                                        #HRKJKE
+                                    </span>
+                                    
+                                    
+                                        <span class="relative flex h-2 w-2">
+                                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                                            <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+                                        </span>
+                                        <span class="bg-rose-600 text-white text-[9px] font-black px-2 py-1 rounded-md">SOS ACTIVE</span>
+                                    
+                                </div>
+                                <p class="text-sm font-black text-slate-900">EMERGENCY SOS VOICE LOG</p>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase">13 minutes ago</p>
+                            </div>
+                        </td>
+
+                        <td class="p-8">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-500 border-2 border-white shadow-sm">
+                                    F
+                                </div>
+                                <div>
+                                    <p class="text-sm font-black text-slate-800">
+                                        flow_student
+                                    </p>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Verified User</p>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="p-8">
+                            <span class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest 
+                                bg-rose-600 text-white
+                                ">
+                                CRITICAL SOS
+                            </span>
+                        </td>
+
+                        <td class="p-8">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-[10px] font-black uppercase text-rose-500">
+                                        Distressed
+                                    </span>
+                                    <span class="text-[10px] font-mono font-bold text-slate-400">-1.00</span>
+                                </div>
+                                <div class="w-32 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                    
+                                    <div class="h-full bg-rose-500" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="p-8 text-right">
+                                     <a href="/incident/8/" 
+                               class="inline-flex items-center gap-3 
+                               bg-rose-600 hover:bg-rose-700 
+                               text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-xl shadow-slate-200">
+                                URGENT: RESPOND
+                            </a>
+                        </td>
+                    </tr>
+                    
+                    <tr class="group transition-all 
+                        
+                            hover:bg-slate-50/80
+                        ">
+                        
+                        <td class="p-8">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-mono font-black text-xs py-1 px-3 rounded-lg border 
+                                        bg-white border-slate-200 text-indigo-600 shadow-sm">
+                                        #2
+                                    </span>
+                                    
+                                    
+                                </div>
+                                <p class="text-sm font-black text-slate-900">Harassed</p>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase">1 day, 4 hours ago</p>
+                            </div>
+                        </td>
+
+                        <td class="p-8">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-500 border-2 border-white shadow-sm">
+                                    
+                                </div>
+                                <div>
+                                    <p class="text-sm font-black text-slate-800">
+                                        
+                                    </p>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Verified User</p>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="p-8">
+                            <span class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest 
+                                bg-indigo-50 text-indigo-600
+                                ">
+                                New
+                            </span>
+                        </td>
+
+                        <td class="p-8">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-[10px] font-black uppercase text-emerald-500">
+                                        Stable
+                                    </span>
+                                    <span class="text-[10px] font-mono font-bold text-slate-400">0.00</span>
+                                </div>
+                                <div class="w-32 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                    
+                                    <div class="h-full bg-emerald-500" style="width: 50%"></div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="p-8 text-right">
+                                     <a href="/incident/2/" 
+                               class="inline-flex items-center gap-3 
+                               bg-slate-900 hover:bg-indigo-600 
+                               text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-xl shadow-slate-200">
+                                Open File
+                            </a>
+                        </td>
+                    </tr>
+                    
+                    <tr class="group transition-all 
+                        
+                            hover:bg-slate-50/80
+                        ">
+                        
+                        <td class="p-8">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-mono font-black text-xs py-1 px-3 rounded-lg border 
+                                        bg-white border-slate-200 text-indigo-600 shadow-sm">
+                                        #1
+                                    </span>
+                                    
+                                    
+                                </div>
+                                <p class="text-sm font-black text-slate-900">Teasing</p>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase">1 day, 4 hours ago</p>
+                            </div>
+                        </td>
+
+                        <td class="p-8">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-500 border-2 border-white shadow-sm">
+                                    🔒
+                                </div>
+                                <div>
+                                    <p class="text-sm font-black text-slate-800">
+                                        Anonymous
+                                    </p>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Verified User</p>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="p-8">
+                            <span class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest 
+                                bg-indigo-50 text-indigo-600
+                                ">
+                                New
+                            </span>
+                        </td>
+
+                        <td class="p-8">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-[10px] font-black uppercase text-emerald-500">
+                                        Stable
+                                    </span>
+                                    <span class="text-[10px] font-mono font-bold text-slate-400">0.00</span>
+                                </div>
+                                <div class="w-32 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                    
+                                    <div class="h-full bg-emerald-500" style="width: 50%"></div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="p-8 text-right">
+                                     <a href="/incident/1/" 
+                               class="inline-flex items-center gap-3 
+                               bg-slate-900 hover:bg-indigo-600 
+                               text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-xl shadow-slate-200">
+                                Open File
+                            </a>
+                        </td>
+                    </tr>
+                    
+                    <tr class="group transition-all 
+                        
+                            hover:bg-slate-50/80
+                        ">
+                        
+                        <td class="p-8">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-mono font-black text-xs py-1 px-3 rounded-lg border 
+                                        bg-white border-slate-200 text-indigo-600 shadow-sm">
+                                        #MW56CF
+                                    </span>
+                                    
+                                    
+                                </div>
+                                <p class="text-sm font-black text-slate-900">Flow Test Incident</p>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase">13 minutes ago</p>
+                            </div>
+                        </td>
+
+                        <td class="p-8">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-500 border-2 border-white shadow-sm">
+                                    F
+                                </div>
+                                <div>
+                                    <p class="text-sm font-black text-slate-800">
+                                        flow_student
+                                    </p>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Verified User</p>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="p-8">
+                            <span class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest 
+                                bg-amber-100 text-amber-600
+                                ">
+                                Under Review
+                            </span>
+                        </td>
+
+                        <td class="p-8">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-[10px] font-black uppercase text-emerald-500">
+                                        Stable
+                                    </span>
+                                    <span class="text-[10px] font-mono font-bold text-slate-400">0.35</span>
+                                </div>
+                                <div class="w-32 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                    
+                                    <div class="h-full bg-emerald-500" style="width: 50%"></div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="p-8 text-right">
+                                     <a href="/incident/7/" 
+                               class="inline-flex items-center gap-3 
+                               bg-slate-900 hover:bg-indigo-600 
+                               text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-xl shadow-slate-200">
+                                Open File
+                            </a>
+                        </td>
+                    </tr>
+                    
+                    <tr class="group transition-all 
+                        
+                            hover:bg-slate-50/80
+                        ">
+                        
+                        <td class="p-8">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-mono font-black text-xs py-1 px-3 rounded-lg border 
+                                        bg-white border-slate-200 text-indigo-600 shadow-sm">
+                                        #TST001
+                                    </span>
+                                    
+                                    
+                                </div>
+                                <p class="text-sm font-black text-slate-900">Test Incident</p>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase">20 minutes ago</p>
+                            </div>
+                        </td>
+
+                        <td class="p-8">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-500 border-2 border-white shadow-sm">
+                                    🔒
+                                </div>
+                                <div>
+                                    <p class="text-sm font-black text-slate-800">
+                                        Anonymous
+                                    </p>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Verified User</p>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="p-8">
+                            <span class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest 
+                                bg-amber-100 text-amber-600
+                                ">
+                                Under Review
+                            </span>
+                        </td>
+
+                        <td class="p-8">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-[10px] font-black uppercase text-emerald-500">
+                                        Stable
+                                    </span>
+                                    <span class="text-[10px] font-mono font-bold text-slate-400">0.00</span>
+                                </div>
+                                <div class="w-32 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                    
+                                    <div class="h-full bg-emerald-500" style="width: 50%"></div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="p-8 text-right">
+                                     <a href="/incident/6/" 
+                               class="inline-flex items-center gap-3 
+                               bg-slate-900 hover:bg-indigo-600 
+                               text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-xl shadow-slate-200">
+                                Open File
+                            </a>
+                        </td>
+                    </tr>
+                    
+                    <tr class="group transition-all 
+                        
+                            hover:bg-slate-50/80
+                        ">
+                        
+                        <td class="p-8">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-mono font-black text-xs py-1 px-3 rounded-lg border 
+                                        bg-white border-slate-200 text-indigo-600 shadow-sm">
+                                        #K7L6AU
+                                    </span>
+                                    
+                                    
+                                </div>
+                                <p class="text-sm font-black text-slate-900">Urgent: Safety Concern near Library</p>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase">22 hours, 27 minutes ago</p>
+                            </div>
+                        </td>
+
+                        <td class="p-8">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-500 border-2 border-white shadow-sm">
+                                    🔒
+                                </div>
+                                <div>
+                                    <p class="text-sm font-black text-slate-800">
+                                        Anonymous
+                                    </p>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Verified User</p>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="p-8">
+                            <span class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest 
+                                bg-emerald-100 text-emerald-600
+                                ">
+                                Resolved
+                            </span>
+                        </td>
+
+                        <td class="p-8">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-[10px] font-black uppercase text-rose-500">
+                                        Distressed
+                                    </span>
+                                    <span class="text-[10px] font-mono font-bold text-slate-400">-1.00</span>
+                                </div>
+                                <div class="w-32 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                    
+                                    <div class="h-full bg-rose-500" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="p-8 text-right">
+                                     <a href="/incident/5/" 
+                               class="inline-flex items-center gap-3 
+                               bg-slate-900 hover:bg-indigo-600 
+                               text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-xl shadow-slate-200">
+                                Open File
+                            </a>
+                        </td>
+                    </tr>
+                    
+                    <tr class="group transition-all 
+                        
+                            hover:bg-slate-50/80
+                        ">
+                        
+                        <td class="p-8">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-mono font-black text-xs py-1 px-3 rounded-lg border 
+                                        bg-white border-slate-200 text-indigo-600 shadow-sm">
+                                        #OR46J7
+                                    </span>
+                                    
+                                    
+                                </div>
+                                <p class="text-sm font-black text-slate-900">Teasing</p>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase">1 day, 2 hours ago</p>
+                            </div>
+                        </td>
+
+                        <td class="p-8">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-500 border-2 border-white shadow-sm">
+                                    D
+                                </div>
+                                <div>
+                                    <p class="text-sm font-black text-slate-800">
+                                        DG
+                                    </p>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Verified User</p>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="p-8">
+                            <span class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest 
+                                bg-amber-100 text-amber-600
+                                ">
+                                Action Taken
+                            </span>
+                        </td>
+
+                        <td class="p-8">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-[10px] font-black uppercase text-emerald-500">
+                                        Stable
+                                    </span>
+                                    <span class="text-[10px] font-mono font-bold text-slate-400">0.00</span>
+                                </div>
+                                <div class="w-32 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                    
+                                    <div class="h-full bg-emerald-500" style="width: 50%"></div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="p-8 text-right">
+                                     <a href="/incident/4/" 
+                               class="inline-flex items-center gap-3 
+                               bg-slate-900 hover:bg-indigo-600 
+                               text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-xl shadow-slate-200">
+                                Open File
+                            </a>
+                        </td>
+                    </tr>
+                    
+                    <tr class="group transition-all 
+                        
+                            hover:bg-slate-50/80
+                        ">
+                        
+                        <td class="p-8">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-mono font-black text-xs py-1 px-3 rounded-lg border 
+                                        bg-white border-slate-200 text-indigo-600 shadow-sm">
+                                        #X9EML6
+                                    </span>
+                                    
+                                    
+                                </div>
+                                <p class="text-sm font-black text-slate-900">Harassment</p>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase">1 day, 2 hours ago</p>
+                            </div>
+                        </td>
+
+                        <td class="p-8">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-500 border-2 border-white shadow-sm">
+                                    🔒
+                                </div>
+                                <div>
+                                    <p class="text-sm font-black text-slate-800">
+                                        Anonymous
+                                    </p>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Verified User</p>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="p-8">
+                            <span class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest 
+                                bg-emerald-100 text-emerald-600
+                                ">
+                                Resolved
+                            </span>
+                        </td>
+
+                        <td class="p-8">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-[10px] font-black uppercase text-emerald-500">
+                                        Stable
+                                    </span>
+                                    <span class="text-[10px] font-mono font-bold text-slate-400">0.00</span>
+                                </div>
+                                <div class="w-32 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                    
+                                    <div class="h-full bg-emerald-500" style="width: 50%"></div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="p-8 text-right">
+                                     <a href="/incident/3/" 
+                               class="inline-flex items-center gap-3 
+                               bg-slate-900 hover:bg-indigo-600 
+                               text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-xl shadow-slate-200">
+                                Open File
+                            </a>
+                        </td>
+                    </tr>
+                    
+                </tbody>
+            </table>
+        </div>
+
+        <div class="md:hidden divide-y divide-slate-50">
+            
+            <div class="p-6 bg-rose-50/60 border-l-4 border-rose-500">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-black px-3 py-1 bg-slate-100 rounded-full text-slate-500">#HRKJKE</span>
+                    
+                        <span class="text-[10px] font-black text-rose-600 animate-pulse">● SOS EMERGENCY</span>
+                    
+                </div>
+                <h3 class="text-lg font-black text-slate-900 mb-1">EMERGENCY SOS VOICE LOG</h3>
+                <div class="flex gap-2 mb-6">
+                    <span class="text-[9px] font-black uppercase text-slate-400 tracking-widest">13 minutes ago</span>
+                    <span class="text-[9px] font-black uppercase text-rose-600 tracking-widest">New</span>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-[10px]">👤</div>
+                        <span class="text-xs font-bold text-slate-600">flow_student</span>
+                    </div>
+                                     <a href="/incident/8/" 
+                       class="bg-rose-600 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase">
+                        RESPOND
+                    </a>
+                </div>
+            </div>
+            
+            <div class="p-6 ">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-black px-3 py-1 bg-slate-100 rounded-full text-slate-500">#2</span>
+                    
+                </div>
+                <h3 class="text-lg font-black text-slate-900 mb-1">Harassed</h3>
+                <div class="flex gap-2 mb-6">
+                    <span class="text-[9px] font-black uppercase text-slate-400 tracking-widest">1 day, 4 hours ago</span>
+                    <span class="text-[9px] font-black uppercase text-indigo-600 tracking-widest">New</span>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-[10px]">👤</div>
+                        <span class="text-xs font-bold text-slate-600"></span>
+                    </div>
+                                     <a href="/incident/2/" 
+                       class="bg-slate-900 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase">
+                        View
+                    </a>
+                </div>
+            </div>
+            
+            <div class="p-6 ">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-black px-3 py-1 bg-slate-100 rounded-full text-slate-500">#1</span>
+                    
+                </div>
+                <h3 class="text-lg font-black text-slate-900 mb-1">Teasing</h3>
+                <div class="flex gap-2 mb-6">
+                    <span class="text-[9px] font-black uppercase text-slate-400 tracking-widest">1 day, 4 hours ago</span>
+                    <span class="text-[9px] font-black uppercase text-indigo-600 tracking-widest">New</span>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-[10px]">👤</div>
+                        <span class="text-xs font-bold text-slate-600">Anonymous</span>
+                    </div>
+                                     <a href="/incident/1/" 
+                       class="bg-slate-900 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase">
+                        View
+                    </a>
+                </div>
+            </div>
+            
+            <div class="p-6 ">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-black px-3 py-1 bg-slate-100 rounded-full text-slate-500">#MW56CF</span>
+                    
+                </div>
+                <h3 class="text-lg font-black text-slate-900 mb-1">Flow Test Incident</h3>
+                <div class="flex gap-2 mb-6">
+                    <span class="text-[9px] font-black uppercase text-slate-400 tracking-widest">13 minutes ago</span>
+                    <span class="text-[9px] font-black uppercase text-indigo-600 tracking-widest">Under Review</span>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-[10px]">👤</div>
+                        <span class="text-xs font-bold text-slate-600">flow_student</span>
+                    </div>
+                                     <a href="/incident/7/" 
+                       class="bg-slate-900 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase">
+                        View
+                    </a>
+                </div>
+            </div>
+            
+            <div class="p-6 ">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-black px-3 py-1 bg-slate-100 rounded-full text-slate-500">#TST001</span>
+                    
+                </div>
+                <h3 class="text-lg font-black text-slate-900 mb-1">Test Incident</h3>
+                <div class="flex gap-2 mb-6">
+                    <span class="text-[9px] font-black uppercase text-slate-400 tracking-widest">20 minutes ago</span>
+                    <span class="text-[9px] font-black uppercase text-indigo-600 tracking-widest">Under Review</span>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-[10px]">👤</div>
+                        <span class="text-xs font-bold text-slate-600">Anonymous</span>
+                    </div>
+                                     <a href="/incident/6/" 
+                       class="bg-slate-900 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase">
+                        View
+                    </a>
+                </div>
+            </div>
+            
+            <div class="p-6 ">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-black px-3 py-1 bg-slate-100 rounded-full text-slate-500">#K7L6AU</span>
+                    
+                </div>
+                <h3 class="text-lg font-black text-slate-900 mb-1">Urgent: Safety Concern near Library</h3>
+                <div class="flex gap-2 mb-6">
+                    <span class="text-[9px] font-black uppercase text-slate-400 tracking-widest">22 hours, 27 minutes ago</span>
+                    <span class="text-[9px] font-black uppercase text-indigo-600 tracking-widest">Resolved</span>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-[10px]">👤</div>
+                        <span class="text-xs font-bold text-slate-600">Anonymous</span>
+                    </div>
+                                     <a href="/incident/5/" 
+                       class="bg-slate-900 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase">
+                        View
+                    </a>
+                </div>
+            </div>
+            
+            <div class="p-6 ">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-black px-3 py-1 bg-slate-100 rounded-full text-slate-500">#OR46J7</span>
+                    
+                </div>
+                <h3 class="text-lg font-black text-slate-900 mb-1">Teasing</h3>
+                <div class="flex gap-2 mb-6">
+                    <span class="text-[9px] font-black uppercase text-slate-400 tracking-widest">1 day, 2 hours ago</span>
+                    <span class="text-[9px] font-black uppercase text-indigo-600 tracking-widest">Action Taken</span>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-[10px]">👤</div>
+                        <span class="text-xs font-bold text-slate-600">DG</span>
+                    </div>
+                                     <a href="/incident/4/" 
+                       class="bg-slate-900 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase">
+                        View
+                    </a>
+                </div>
+            </div>
+            
+            <div class="p-6 ">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-black px-3 py-1 bg-slate-100 rounded-full text-slate-500">#X9EML6</span>
+                    
+                </div>
+                <h3 class="text-lg font-black text-slate-900 mb-1">Harassment</h3>
+                <div class="flex gap-2 mb-6">
+                    <span class="text-[9px] font-black uppercase text-slate-400 tracking-widest">1 day, 2 hours ago</span>
+                    <span class="text-[9px] font-black uppercase text-indigo-600 tracking-widest">Resolved</span>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-[10px]">👤</div>
+                        <span class="text-xs font-bold text-slate-600">Anonymous</span>
+                    </div>
+                                     <a href="/incident/3/" 
+                       class="bg-slate-900 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase">
+                        View
+                    </a>
+                </div>
+            </div>
+            
+        </div>
+
+        
+    </div>
+</div>
+
+    </main>
+
+    
+    <div class="md:hidden fixed bottom-6 left-6 right-6 z-[100]">
+        <nav class="bg-slate-900/95 backdrop-blur-xl rounded-[2.5rem] border border-white/10 shadow-2xl h-16 flex items-center justify-around px-2">
+            <a href="/home/" class="flex flex-col items-center justify-center w-12 h-12 rounded-full text-white/50 hover:text-white transition">
+                <i class="fas fa-chart-pie text-lg"></i>
+                <span class="text-[8px] font-black uppercase mt-0.5">Stats</span>
+            </a>
+            
+            <a href="/report/" class="flex items-center justify-center w-14 h-14 bg-indigo-600 rounded-full border-4 border-slate-50 -mt-10 shadow-xl shadow-indigo-500/40 active:scale-90 transition-transform">
+                <i class="fas fa-plus text-white text-xl"></i>
+            </a>
+
+            <a href="#" class="flex flex-col items-center justify-center w-12 h-12 rounded-full text-white/50 hover:text-white transition">
+                <i class="fas fa-comment-dots text-lg"></i>
+                <span class="text-[8px] font-black uppercase mt-0.5">Chat</span>
+            </a>
+        </nav>
+    </div>
+    
+
+    
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('nav-menu');
+            const body = document.body;
+            menu.classList.toggle('hidden');
+            menu.classList.toggle('flex');
+            body.classList.toggle('menu-open');
+        }
+
+        // SOS Script Logic
+        const sosBtn = document.getElementById('sosBtn');
+        const modal = document.getElementById('sosModal');
+        const callUI = document.getElementById('callUI');
+        const recordUI = document.getElementById('recordUI');
+        let mediaRecorder;
+        let audioChunks = [];
+
+        if(sosBtn) {
+            sosBtn.onclick = () => {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    if(!modal.classList.contains('hidden')) startVoicemail();
+                }, 4000);
+            };
+        }
+
+        function closeSOS() { modal.classList.add('hidden'); }
+
+        async function startVoicemail() {
+            callUI.classList.add('hidden');
+            recordUI.classList.remove('hidden');
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.start();
+                
+                let sec = 0;
+                setInterval(() => {
+                    sec++;
+                    let m = Math.floor(sec/60);
+                    let s = sec%60;
+                    document.getElementById('timer').innerText = `${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
+                }, 1000);
+
+                mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
+                mediaRecorder.onstop = async () => {
+                    const blob = new Blob(audioChunks, { type: 'audio/wav' });
+                    const formData = new FormData();
+                    formData.append('audio_data', blob);
+                    formData.append('csrfmiddlewaretoken', '4kQ4yeZaGXdeNsXuLTrULVxSSYQlkyYY1XTI4A5Su54FreGp4gm0ocvt2uu4ya4c');
+                    const response = await fetch('/handle-sos/', { method: 'POST', body: formData });
+                    if (response.ok) {
+                        modal.innerHTML = "<div class='p-12 text-center'><h2 class='text-3xl font-black text-emerald-600 mb-2'>Sent.</h2><p class='text-slate-500 font-bold'>Authorities have been notified.</p></div>";
+                        setTimeout(() => location.reload(), 2000);
+                    }
+                };
+            } catch (err) {
+                alert("Microphone required for SOS.");
+                closeSOS();
+            }
+        }
+
+        const stopBtn = document.getElementById('stopRecord');
+        if(stopBtn) stopBtn.onclick = () => { if(mediaRecorder) mediaRecorder.stop(); };
+    </script>
+    
+</body>
+</html>
