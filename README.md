@@ -10,7 +10,7 @@ The platform focuses on **privacy, institutional accountability, and gender safe
 ## 🌐 Live Deployment
 
 🚀 **Live Website:** *(Deployed on Render)*  
-🔗 **Live Link:** <[YOUR_RENDER_LINK_HERE](https://safecampus-k3af.onrender.com)>
+🔗 **Live Link:** <https://safecampus-k3af.onrender.com>
 
 > ⚠️ **Important Note:**  
 > This application is deployed on **Render (free tier)**.  
