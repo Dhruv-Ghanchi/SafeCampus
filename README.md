@@ -10,7 +10,7 @@ The platform focuses on **privacy, institutional accountability, and gender safe
 ## 🌐 Live Deployment
 
 🚀 **Live Website:** *(Deployed on Render)*  
-🔗 **Live Link:** <YOUR_RENDER_LINK_HERE>
+🔗 **Live Link:** <[YOUR_RENDER_LINK_HERE](https://safecampus-k3af.onrender.com)>
 
 > ⚠️ **Important Note:**  
 > This application is deployed on **Render (free tier)**.  
@@ -182,7 +182,7 @@ These insights help institutions take **preventive and proactive actions**, not 
 - **Frontend:** Django Templates + Tailwind CSS  
 - **Backend:** Django (Class-Based Views)  
 - **ML Layer:** Python (scikit-learn / NLP utilities)  
-- **Database:** PostgreSQL  
+- **Database:** SQLite  
 - **Media Storage:** Local (scalable to cloud)  
 - **Authentication:** Django Auth + Role-Based Access Control  
 
@@ -202,13 +202,7 @@ These insights help institutions take **preventive and proactive actions**, not 
 - Django Forms & CBVs  
 
 ### Database
-- PostgreSQL  
-
-**Why PostgreSQL?**
-- Strong relational data handling  
-- ACID compliance (critical for safety/legal data)  
-- Better analytics and reporting  
-- Native Django support  
+- SQLite
 
 ### ML & Data Processing
 - Python  
